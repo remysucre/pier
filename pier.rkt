@@ -1,7 +1,5 @@
 #lang rosette/safe
 
-(define-symbolic s-min (~> (~> integer? integer?) integer?))
-
 (define (s-min f)
   (begin
     (define-symbolic x y z real?)
@@ -38,6 +36,13 @@
                  (&& (R x y w1)
                      (&& (E y z w2)
                          (= w (* w1 w2))))))))))))
+
+;; lower bound:
+;; forall x. s-min <= f x
+;; glub:
+;; forall z. (forall x. z <= f x) => s-min >= z
+;; alternatively:
+;; exists x. s-min = f x
 
 (define (rule-S R E x z)
   (s-min

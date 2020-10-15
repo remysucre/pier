@@ -90,19 +90,19 @@
 
 ;; b is an upperbound of f(w)
 ;; if f(w) is unbounded, inf is #t
-(define (trop-ub inf w b f)
-  (if inf
-      (exists (list w) (boolean? (f w)))
-      (forall (list w) (<= b (f w)))))
+(define (trop-ub w b f)
+  (forall (list w)
+          (if (boolean? (f w))
+              #t
+              (<= b (f w)))))
 
 ;; lb is a lub of f
 ;; if f is unbounded, inf is true
-(define (trop-lub inf b w lb f)
-  (&& (trop-ub inf w lb f)
-      (if inf #t
-          (forall (list b)
-                  (=> (ub inf w b f)
-                      (<= b lb))))))
+(define (trop-lub b w lb f)
+  (&& (trop-ub w lb f)
+      (forall (list b)
+              (=> (ub w b f)
+                  (<= b lb)))))
 
 #;(define (rule-S R E x z)
   (s-min
@@ -113,14 +113,14 @@
     (define (f0 w)
       ;;(t* (to-trop (rule-R R E x z w)) w))
       #;(t* (to-trop (R x z w)) w)
-      7
+      (t* (to-trop (R x z w)) w)
       )
     (define (f1)
       (define-symbolic w integer?)
       (define-symbolic inf boolean?)
       (define-symbolic min-w ub-w integer?)
       ;;(assert (trop-lub inf ub-w w min-w f0))
-      (assert (trop-ub inf w min-w f0))
+      (assert (trop-ub w min-w f0))
       (if inf inf min-w))
     (f1)
     )
@@ -132,7 +132,7 @@
 ;; (rule-S R E x z)
 ;; (solve (rule-S R E x z))
 ;; (solve (rule-S R E x z))
-(solve (> (rule-S R E x z) 0))
+(solve (assert (= (rule-S R E x z) 5)))
 
 ;; (define (R x y z) (= z 3))
 ;; (define (E x y z) (= z 3))

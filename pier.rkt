@@ -105,7 +105,7 @@
 (define (trop-lub b w lb f)
   (&& (trop-ub w lb f)
       (forall (list b)
-              (=> (ub w b f)
+              (=> (trop-ub w b f)
                   (<= b lb)))))
 
 ;; (define (rule-S R E x z)
@@ -116,15 +116,17 @@
   (begin
     (define (f0 w)
       ;;(t* (to-trop (rule-R R E x z w)) w))
-      #;(t* (to-trop (R x z w)) w)
       (t* (to-trop (R x z w)) w)
       )
     (define (f1)
       (define-symbolic w integer?)
       (define-symbolic inf boolean?)
       (define-symbolic min-w ub-w integer?)
-      ;;(assert (trop-lub inf ub-w w min-w f0))
-      (assert (trop-lub ub-w w min-w f0))
+      (assert
+       (if (forall (list w) (boolean? (f0 w)))
+           inf
+           (trop-lub inf ub-w w min-w f0)))
+      ;;(assert (trop-lub ub-w w min-w f0))
       (if inf inf min-w))
     (f1)
     )

@@ -1,10 +1,12 @@
 #lang rosette/safe
 
 ;; b is an upperbound of f(w)
+
 (define (ub w b f geq)
   (forall (list w) (geq b (f w))))
 
 ;; lb is a lub of f
+
 (define (lub b w lb f geq)
   (&& (ub w lb f geq)
       (forall (list b)
@@ -90,6 +92,7 @@
 
 ;; b is an upperbound of f(w)
 ;; if f(w) is unbounded, inf is #t
+
 (define (trop-ub w b f)
   (forall (list w)
           (if (boolean? (f w))
@@ -98,15 +101,16 @@
 
 ;; lb is a lub of f
 ;; if f is unbounded, inf is true
+
 (define (trop-lub b w lb f)
   (&& (trop-ub w lb f)
       (forall (list b)
               (=> (ub w b f)
                   (<= b lb)))))
 
-#;(define (rule-S R E x z)
-  (s-min
-   (lambda (w) (* (to-int (rule-R R E x z w)) w))))
+;; (define (rule-S R E x z)
+;;   (s-min
+;;    (lambda (w) (* (to-int (rule-R R E x z w)) w))))
 
 (define (rule-S R E x z)
   (begin
@@ -120,7 +124,7 @@
       (define-symbolic inf boolean?)
       (define-symbolic min-w ub-w integer?)
       ;;(assert (trop-lub inf ub-w w min-w f0))
-      (assert (trop-ub w min-w f0))
+      (assert (trop-lub ub-w w min-w f0))
       (if inf inf min-w))
     (f1)
     )
@@ -132,6 +136,7 @@
 ;; (rule-S R E x z)
 ;; (solve (rule-S R E x z))
 ;; (solve (rule-S R E x z))
+
 (solve (assert (= (rule-S R E x z) 5)))
 
 ;; (define (R x y z) (= z 3))

@@ -37,7 +37,7 @@
     (define (f0 y w1 w2)
       (&& (R x y w1)
           (&& (E y z w2)
-              (= w (* w1 w2)))))
+              (= w (+ w1 w2)))))
     (define (f1 y w1)
       (begin
         (define-symbolic w2 integer?)

@@ -66,80 +66,92 @@
 ;; (solve (assert (! (rule-R R E x z w))))
 
 ;; #f represents infinity
+
+(struct trop (i n) #:transparent)
+
+;; TODO try (trop #t (assert #f))
 (define (to-trop b)
-  (if b 0 #t))
+  (if b (trop #f 0) (trop #t 1)))
 
+;; min
 (define (t+ x y)
-  (if (number? x)
-      (if (number? y)
-          (min x y)
-          x)
-      y))
+  (if (trop-i x)
+      y
+      (if (trop-i y)
+          x
+          (trop #f (min (trop-n x)
+                        (trop-n y))))))
 
+;; +
 (define (t* x y)
-  (if (number? x)
-      (if (number? y)
-          (+ x y)
-          #t)
-      #t))
+  (if (trop-i x)
+      (trop #t 1)
+      (if (trop-i y)
+          (trop #t 1)
+          (trop #f (+ (trop-n x)
+                      (trop-n y))))))
 
+;; <=
 (define (t>= x y)
-  (if (number? x)
-      (if (number? y)
-          (<= x y)
-          #f)
-      #t))
+  (if (trop-i y)
+      #t
+      (if (trop-i x)
+          #f
+          (<= (trop-n x) (trop-n y)))))
+
+(assert (t>= (trop #f 5) (trop #t 1)))
+(assert (t>= (trop #f 5) (trop #f 6)))
+(assert (t>= (trop #t 5) (trop #t 1)))
 
 ;; b is an upperbound of f(w)
-;; if f(w) is unbounded, inf is #t
 
 (define (trop-ub w b f)
-  (forall (list w)
-          (if (boolean? (f w))
-              #t
-              (<= b (f w)))))
+    (forall (list w) (t>= b (f w))))
+
+;; (assert (! (trop-ub 0 f)))
 
 ;; lb is a lub of f
-;; if f is unbounded, inf is true
 
-(define (trop-lub b w lb f)
-  (&& (trop-ub w lb f)
-      (forall (list b)
-              (=> (trop-ub w b f)
-                  (<= b lb)))))
+;; (define (trop-lub b w lb f)
+;;   (&& (trop-ub w lb f)
+;;       (let ([i (trop-i b)]
+;;             [n (trop-n b)])
+;;         (forall (list i n)
+;;                 (=> (trop-ub w (trop i n) f)
+;;                     (t>= (trop i n) lb))))))
 
 ;; (define (rule-S R E x z)
 ;;   (s-min
 ;;    (lambda (w) (* (to-int (rule-R R E x z w)) w))))
 
-(define (rule-S R E x z)
-  (begin
-    (define (f0 w)
-      ;;(t* (to-trop (rule-R R E x z w)) w))
-      (t* (to-trop (R x z w)) w)
-      )
-    (define (f1)
-      (define-symbolic w integer?)
-      (define-symbolic inf boolean?)
-      (define-symbolic min-w ub-w integer?)
-      (assert
-       (if (forall (list w) (boolean? (f0 w)))
-           inf
-           (trop-lub inf ub-w w min-w f0)))
-      ;;(assert (trop-lub ub-w w min-w f0))
-      (if inf inf min-w))
-    (f1)
-    )
-  )
+;; (define (rule-S R E x z)
+;;   (begin
+;;     (define (f0 w)
+;;       ;;(t* (to-trop (rule-R R E x z w)) w))
+;;       (t* (to-trop (R x z w)) w)
+;;       )
+;;     (define (f1)
+;;       (define-symbolic w integer?)
+;;       (define-symbolic inf boolean?)
+;;       (define-symbolic min-w ub-w integer?)
+;;       (assert
+;;        (if (forall (list w) (boolean? (f0 w)))
+;;            inf
+;;            (trop-lub inf ub-w w min-w f0)))
+;;       ;;(assert (trop-lub ub-w w min-w f0))
+;;       (if inf inf min-w))
+;;     (f1)
+;;     )
+;;   )
 
-(define-symbolic x z integer?)
-(define-symbolic R E (~> integer? integer? integer? boolean?))
+;; (define-symbolic x z integer?)
+;; (define-symbolic R E (~> integer? integer? integer? boolean?))
 ;; (define-symbolic R (~> integer? integer? integer? boolean?))
 ;; (rule-S R E x z)
 ;; (solve (rule-S R E x z))
 ;; (solve (rule-S R E x z))
 
-(solve (assert (= (rule-S R E x z) 5)))
+;; (solve (assert (= (rule-S R E x z) 5)))
 
 ;; (define (R x y z) (= z 3))
 ;; (define (E x y z) (= z 3))

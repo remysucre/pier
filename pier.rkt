@@ -2,23 +2,24 @@
 
 ;; b is an upperbound of f(w)
 
-(define (ub w b f geq)
-  (forall (list w) (geq b (f w))))
+(define (ub b f geq)
+  (begin
+    (define-symbolic* w integer?)
+    (forall (list w) (geq b (f w)))))
 
 ;; lb is a lub of f
 
-(define (lub b w lb f geq)
-  (&& (ub w lb f geq)
+(define (lub lb f geq)
+  (begin
+    (define-symbolic* b boolean?)
+    (&& (ub lb f geq)
       (forall (list b)
-          (=> (ub w b f geq)
-              (geq b lb)))))
+          (=> (ub b f geq)
+              (geq b lb))))))
 
-;; (define (f n) (+ (abs n) 1))
-
-;; (define-symbolic s-min integer?)
-;; (define-symbolic n b integer?)
-
-;; (solve (assert (lub b n s-min f <=)))
+;; (define (f n) (> n 0))
+;; (define-symbolic s-any boolean?)
+;; (solve (assert (lub s-any f =>)))
 
 #;(define (rule-R R E x z w)
   (|| (E x z w)
@@ -40,30 +41,24 @@
               (= w (+ w1 w2)))))
     (define (f1 y w1)
       (begin
-        (define-symbolic w2 integer?)
-        (define-symbolic any-w2 ub-w2 boolean?)
-        (assert (lub ub-w2 w2 any-w2 ((curry f0) y w1) =>))
+        (define-symbolic any-w2 boolean?)
+        (assert (lub any-w2 ((curry f0) y w1) =>))
         any-w2))
     (define (f2 y)
       (begin
-        (define-symbolic w1 integer?)
-        (define-symbolic any-w1 ub-w1 boolean?)
-        (assert (lub ub-w1 w1 any-w1 ((curry f1) y) =>))
+        (define-symbolic any-w1 boolean?)
+        (assert (lub any-w1 ((curry f1) y) =>))
         any-w1))
     (define (f3)
       (begin
-        (define-symbolic y integer?)
-        (define-symbolic any-y ub-y boolean?)
-        (assert (lub ub-y y any-y f2 =>))
+        (define-symbolic any-y boolean?)
+        (assert (lub any-y f2 =>))
         any-y))
-    (|| (E x z w) (f3))
-    )
-  )
+    (|| (E x z w) (f3))))
 
-;; (clear-asserts!)
 ;; (define-symbolic R E (~> integer? integer? integer? boolean?))
 ;; (define-symbolic x z w integer?)
-;; (solve (assert (! (rule-R R E x z w))))
+;; (solve (assert (rule-R R E x z w)))
 
 ;; #f represents infinity
 

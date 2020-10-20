@@ -105,27 +105,31 @@
 
 ;; b is an upperbound of f(w)
 
-(define (trop-ub w b f)
-    (forall (list w) (t>= b (f w))))
-
+(define (trop-ub b f)
+  (begin
+    (define-symbolic* w integer?)
+    (forall (list w) (t>= b (f w)))))
 
 ;; lb is a lub of f
 
-(define (trop-lub b w1 w2 lb f)
-  (&& (trop-ub w1 lb f)
-      (let ([i (trop-i b)]
-            [n (trop-n b)])
+(define (trop-lub lb f)
+  (begin
+    (define-symbolic* n integer?)
+    (define-symbolic* i boolean?)
+    (&& (trop-ub lb f)
         (forall (list i n)
-                (=> (trop-ub w2 (trop i n) f)
+                (=> (trop-ub (trop i n) f)
                     (t>= (trop i n) lb))))))
 
 (define (s-abs n) (trop #f (abs n)))
 
+(verify (assert (trop-ub (trop #f 0) s-abs)))
+(verify (assert (trop-ub (trop #f -1) s-abs)))
+(verify (assert (! (trop-ub (trop #f 1) s-abs))))
 
-(define-symbolic bn w1 w2 integer?)
-(define-symbolic bi boolean?)
-
-(verify (assert (trop-lub (trop bi bn) w1 w2 (trop #f 0) s-abs)))
+(verify (assert (trop-lub (trop #f 0) s-abs)))
+(verify (assert (! (trop-lub (trop #f -1) s-abs))))
+(verify (assert (! (trop-lub (trop #f 1) s-abs))))
 
 ;; (define (rule-S R E x z)
 ;;   (s-min

@@ -3,7 +3,7 @@
 (define (to-num b)
   (if b 1 0))
 
-(define (sigma f)
+(define (s-sum f)
   (lambda (w) (apply + (map f w))))
 
 (define (rule-R v R t j w)
@@ -13,9 +13,9 @@
           (> t 1))))
 
 (define (rule-S v R t js ws)
-  ((sigma
+  ((s-sum
     (lambda (j)
-      ((sigma
+      ((s-sum
         (lambda (w)
           (* w
              (to-num
@@ -26,9 +26,9 @@
    js))
 
 (define (S v R t js ws)
-  ((sigma
+  ((s-sum
     (lambda (j)
-      ((sigma
+      ((s-sum
         (lambda (w)
           (* w
              (to-num
@@ -40,9 +40,9 @@
 
 (define (rule-S-opt v R t js ws)
   (+ (* (to-num (> t 1)) (S v R (- t 1) js ws))
-     ((sigma
+     ((s-sum
        (lambda (j)
-         ((sigma
+         ((s-sum
            (lambda (w)
              (* w
                 (to-num
@@ -63,9 +63,9 @@
 (verify (assert (= (rule-S v R t js ws) (rule-S-opt v R t js ws))))
 
 ;; (define (rule-S-58 v R t js ws)
-;;   ((sigma
+;;   ((s-sum
 ;;     (lambda (j)
-;;       ((sigma
+;;       ((s-sum
 ;;         (lambda (w)
 ;;           (* w
 ;;              (to-num
@@ -79,9 +79,9 @@
 ;;    js))
 
 ;; (define (rule-S-59 v R t js ws)
-;;   (+ ((sigma
+;;   (+ ((s-sum
 ;;        (lambda (j)
-;;          ((sigma
+;;          ((s-sum
 ;;            (lambda (w)
 ;;              (* w
 ;;                 (to-num
@@ -91,9 +91,9 @@
 ;;                      (<= j t))))))
 ;;           ws)))
 ;;       js)
-;;      ((sigma
+;;      ((s-sum
 ;;        (lambda (j)
-;;          ((sigma
+;;          ((s-sum
 ;;            (lambda (w)
 ;;              (* w
 ;;                 (to-num
@@ -106,9 +106,9 @@
 ;;       js)))
 
 ;; (define (rule-S-60 v R t js ws)
-;;   (+ ((sigma
+;;   (+ ((s-sum
 ;;        (lambda (j)
-;;          ((sigma
+;;          ((s-sum
 ;;            (lambda (w)
 ;;              (* w
 ;;                 (to-num
@@ -117,9 +117,9 @@
 ;;                      (<= 1 j))))))
 ;;           ws)))
 ;;       js)
-;;      ((sigma
+;;      ((s-sum
 ;;        (lambda (j)
-;;          ((sigma
+;;          ((s-sum
 ;;            (lambda (w)
 ;;              (* w
 ;;                 (to-num
@@ -131,9 +131,9 @@
 ;;       js)))
 
 ;; (define (rule-S-61 v R t js ws)
-;;   (+ ((sigma
+;;   (+ ((s-sum
 ;;        (lambda (j)
-;;          ((sigma
+;;          ((s-sum
 ;;            (lambda (w)
 ;;              (* w
 ;;                 (to-num
@@ -143,9 +143,9 @@
 ;;           ws)))
 ;;       js)
 ;;      (* (to-num (> t 1))
-;;         ((sigma
+;;         ((s-sum
 ;;           (lambda (j)
-;;             ((sigma
+;;             ((s-sum
 ;;               (lambda (w)
 ;;                 (* w
 ;;                    (to-num

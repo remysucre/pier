@@ -48,15 +48,17 @@
 
 (define-symbolic R E (~> integer? integer? integer? boolean?))
 (define-symbolic x z integer?)
+
 (define ys (range 4))
 (define ws (range 8))
 (define w1s (range 4))
 (define w2s (range 4))
 
-(verify (assert (! (= (rule-S R E x z ws ys w1s w2s)
-                      (rule-S-opt R E x z ws ys w1s w2s)))))
 (verify (assert (= (rule-S R E x z ws ys w1s w2s)
                    (rule-S-opt R E x z ws ys w1s w2s))))
+
+;; (verify (assert (! (= (rule-S R E x z ws ys w1s w2s)
+;;                       (rule-S-opt R E x z ws ys w1s w2s)))))
 
 ;; (define (S-27 R E x z ws ys w1s w2s)
 ;;   (s-min

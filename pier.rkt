@@ -1,17 +1,17 @@
 #lang rosette/safe
 
-(define (ub b f geq)
+(define (ub b f leq)
   (begin
     (define-symbolic* w integer?)
-    (forall (list w) (geq b (f w)))))
+    (forall (list w) (leq (f w) b))))
 
-(define (lub lb f geq)
+(define (lub lb f leq)
   (begin
     (define-symbolic* b boolean?)
-    (&& (ub lb f geq)
+    (&& (ub lb f leq)
       (forall (list b)
-          (=> (ub b f geq)
-              (geq b lb))))))
+          (=> (ub b f leq)
+              (leq lb b))))))
 
 ;; (define (f n) (> n 0))
 ;; (define-symbolic s-any boolean?)

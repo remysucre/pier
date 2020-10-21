@@ -137,6 +137,17 @@
       min-w)
     (f1)))
 
+(define (S R x z)
+  (begin
+    (define (f0 w)
+      (t* (to-trop (R x z w))
+          (trop #f w)))
+    (define (f1)
+      (define-symbolic min-w integer?)
+      (assert (trop-lub (trop #f min-w) f0))
+      min-w)
+    (f1)))
+
 ;; (define (rule-S-opt R E x z)
 ;;   (min (s-min
 ;;         (lambda (w)
@@ -147,3 +158,36 @@
 ;;              (s-min
 ;;               (lambda (w2)
 ;;                 (* (to-int (E y z w2)) w2))))))))
+
+(define (rule-S-opt R E x z)
+  (begin
+    (define (f0 w)
+      (t* (to-trop (E x z w))
+          (trop #f w)))
+    (define (f1)
+      (define-symbolic min-w integer?)
+      (assert (trop-lub (trop #f min-w) f0))
+      min-w)
+    (define (g0 y w2)
+      (t* (to-trop (E y z w2))
+          (trop #f w2)))
+    (define (g1 y)
+      (define-symbolic min-w2 integer?)
+      (assert (trop-lub (trop #f min-w2) ((curry g0) y)))
+      (t* (trop #f (S R x y))
+          (trop #f min-w2)))
+    (define (g2)
+      (define-symbolic min-y integer?)
+      (assert (trop-lub (trop #f min-y) g1))
+      min-y)
+    (min (f1) (g2))))
+
+(define-symbolic R E (~> integer? integer? integer? boolean?))
+(define-symbolic x z integer?)
+
+(define S-opt-out (rule-S-opt R E x z))
+(define S-out (rule-S R E x z))
+
+(verify (assert (= S-opt-out S-opt-out)))
+(verify (assert (= S-out S-out)))
+(verify (assert (= S-opt-out S-out)))

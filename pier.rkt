@@ -1,13 +1,9 @@
 #lang rosette/safe
 
-;; b is an upperbound of f(w)
-
 (define (ub b f geq)
   (begin
     (define-symbolic* w integer?)
     (forall (list w) (geq b (f w)))))
-
-;; lb is a lub of f
 
 (define (lub lb f geq)
   (begin
@@ -30,15 +26,15 @@
             (s-any
              (lambda (w2)
                (&& (R x y w1)
-                   (&& (E y z w2)
-                       (= w (* w1 w2))))))))))))
+                   (E y z w2)
+                   (= w (+ w1 w2)))))))))))
 
 (define (rule-R R E x z w)
   (begin
     (define (f0 y w1 w2)
       (&& (R x y w1)
-          (&& (E y z w2)
-              (= w (+ w1 w2)))))
+          (E y z w2)
+          (= w (+ w1 w2))))
     (define (f1 y w1)
       (begin
         (define-symbolic any-w2 boolean?)
@@ -130,43 +126,16 @@
 ;;   (s-min
 ;;    (lambda (w) (* (to-int (rule-R R E x z w)) w))))
 
-;; (define (rule-S R E x z)
-;;   (begin
-;;     (define (f0 w)
-;;       ;;(t* (to-trop (rule-R R E x z w)) w))
-;;       (t* (to-trop (R x z w)) w)
-;;       )
-;;     (define (f1)
-;;       (define-symbolic w integer?)
-;;       (define-symbolic inf boolean?)
-;;       (define-symbolic min-w ub-w integer?)
-;;       (assert
-;;        (if (forall (list w) (boolean? (f0 w)))
-;;            inf
-;;            (trop-lub inf ub-w w min-w f0)))
-;;       ;;(assert (trop-lub ub-w w min-w f0))
-;;       (if inf inf min-w))
-;;     (f1)
-;;     )
-;;   )
-
-;; (define-symbolic x z integer?)
-;; (define-symbolic R E (~> integer? integer? integer? boolean?))
-;; (define-symbolic R (~> integer? integer? integer? boolean?))
-;; (rule-S R E x z)
-;; (solve (rule-S R E x z))
-;; (solve (rule-S R E x z))
-
-;; (solve (assert (= (rule-S R E x z) 5)))
-
-;; (define (R x y z) (= z 3))
-;; (define (E x y z) (= z 3))
-;; (solve (assert (< (rule-S R E 1 2) 0)))
-
-;; (assert (forall w (<= s-min (* (to-int (rule-R R E x z w)) w))))
-;; (assert (forall z (=> (forall w (<= z (* (to-int (rule-R R E x z w)) w))) (>= s-min z))))
-;; (assert (exists w (= s-min (* (to-int (rule-R R E x z w)) w))))
-
+(define (rule-S R E x z)
+  (begin
+    (define (f0 w)
+      (t* (to-trop (rule-R R E x z w))
+          (trop #f w)))
+    (define (f1)
+      (define-symbolic min-w integer?)
+      (assert (trop-lub (trop #f min-w) f0))
+      min-w)
+    (f1)))
 
 ;; (define (rule-S-opt R E x z)
 ;;   (min (s-min
@@ -178,8 +147,3 @@
 ;;              (s-min
 ;;               (lambda (w2)
 ;;                 (* (to-int (E y z w2)) w2))))))))
-
-;; (define-symbolic x z integer?)
-;; (define-symbolic R (~> integer? boolean?))
-;; (define-symbolic E (~> integer? boolean?))
-;; (define sol (verify (assert (= (rule-S-opt R E x z) (rule-S R E x z)))))

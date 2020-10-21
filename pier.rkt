@@ -148,6 +148,75 @@
       min-w)
     (f1)))
 
+;; (define (S-27 R E x z)
+;;   (begin
+;;     (define (f0 w y w1 w2)
+;;       (&& (R x y w1)
+;;           (E y z w2)
+;;           (= w (+ w1 w2))))
+;;     (define (f1 w y w1)
+;;       (begin
+;;         (define-symbolic any-w2 boolean?)
+;;         (assert (lub any-w2 ((curry f0) w y w1) =>))
+;;         any-w2))
+;;     (define (f2 w y)
+;;       (begin
+;;         (define-symbolic any-w1 boolean?)
+;;         (assert (lub any-w1 ((curry f1) w y) =>))
+;;         any-w1))
+;;     (define (f3 w)
+;;       (begin
+;;         (define-symbolic any-y boolean?)
+;;         (assert (lub any-y ((curry f2) w) =>))
+;;         any-y))
+;;     (define (s0 w)
+;;       (t* (to-trop (|| (E x z w) (f3 w)))
+;;           (trop #f w)))
+;;     (define (s1)
+;;       (define-symbolic min-w integer?)
+;;       (assert (trop-lub (trop #f min-w) s0))
+;;       min-w)
+;;     (s1)))
+
+(define (S-27 R E x z)
+  (begin
+    (define (f0 w y w1 w2)
+      (&& (R x y w1)
+          (E y z w2)
+          (= w (+ w1 w2))))
+    (define (f1 w y w1)
+      (begin
+        (define-symbolic* any-w2 boolean?)
+        (assert (lub any-w2 ((curry f0) w y w1) =>))
+        any-w2))
+    (define (f2 w y)
+      (begin
+        (define-symbolic* any-w1 boolean?)
+        (assert (lub any-w1 ((curry f1) w y) =>))
+        any-w1))
+    (define (f3 w)
+      (begin
+        (define-symbolic* any-y boolean?)
+        ;; (assert (lub any-y ((curry f2) w) =>))
+        (t* (to-trop any-y)
+              (trop #f w))
+        ))
+    (define (f4)
+      (begin
+        (define-symbolic* min-w integer?)
+        (assert (trop-lub (trop #f min-w) f3))
+        min-w))
+    (define (s0 w)
+      (t* (to-trop (E x z w))
+          (trop #f w)))
+    (define (s1)
+      (begin
+        (define-symbolic min-w+ integer?)
+        (assert (trop-lub (trop #f min-w+) s0))
+        min-w+))
+    #;(min (s1) (f4))
+    (f4)))
+
 ;; (define (rule-S-opt R E x z)
 ;;   (min (s-min
 ;;         (lambda (w)
@@ -187,7 +256,9 @@
 
 (define S-opt-out (rule-S-opt R E x z))
 (define S-out (rule-S R E x z))
+(define S-27-out (S-27 R E x z))
 
 (verify (assert (= S-opt-out S-opt-out)))
 (verify (assert (= S-out S-out)))
-(verify (assert (= S-opt-out S-out)))
+(verify (assert (! (= S-27-out S-out))))
+(verify (assert (= S-27-out S-out)))

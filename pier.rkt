@@ -1,17 +1,19 @@
 #lang rosette/safe
 
-(define (ub b f leq)
-  (begin
-    (define-symbolic* w integer?)
-    (forall (list w) (leq (f w) b))))
+;; (define (ub b f leq)
+;;     (define-symbolic* w integer?)
+;;     (exists (list w) (f w)))
 
-(define (lub lb f leq)
-  (begin
-    (define-symbolic* b boolean?)
-    (&& (ub lb f leq)
-      (forall (list b)
-          (=> (ub b f leq)
-              (leq lb b))))))
+(define (lub f)
+    ;; (define-symbolic* b boolean?)
+    (define-symbolic* w integer?)
+    (exists (list w) (f w))
+
+    #;(&& (ub lb f leq)
+        (=> (ub #t f leq) lb)
+        #;(forall (list b)
+                (=> (ub b f leq)
+                    (leq lb b)))))
 
 (struct trop (i n) #:transparent)
 
@@ -51,20 +53,18 @@
 ;; b is an upperbound of f(w)
 
 (define (trop-ub b f)
-  (begin
-    (define-symbolic w integer?)
-    (forall (list w) (t>= b (f w)))))
+  (define-symbolic* w integer?)
+  (forall (list w) (t>= b (f w))))
 
 ;; lb is a lub of f
 
 (define (trop-lub lb f)
-  (begin
-    (define-symbolic n integer?)
-    (define-symbolic i boolean?)
+    (define-symbolic* n integer?)
+    (define-symbolic* i boolean?)
     (&& (trop-ub lb f)
         (forall (list i n)
                 (=> (trop-ub (trop i n) f)
-                    (t>= (trop i n) lb))))))
+                    (t>= (trop i n) lb)))))
 
 (define (s-abs n) (trop #f (abs n)))
 
@@ -79,7 +79,6 @@
   (f1))
 
 (define (S R x z)
-  (begin
     (define (f0 w)
       (t* (to-trop (R x z w))
           (trop #f w)))
@@ -87,7 +86,7 @@
       (define-symbolic min-w integer?)
       (assert (trop-lub (trop #f min-w) f0))
       min-w)
-    (f1)))
+    (f1))
 
 (define (rule-R R E x z w)
   (define (f0 y w1 w2)
@@ -95,47 +94,43 @@
         (E y z w2)
         (= w (+ w1 w2))))
   (define (f1 y w1)
-    (define-symbolic any-w2 boolean?)
-    (assert (lub any-w2 ((curry f0) y w1) =>))
-    any-w2)
+    ;; (define-symbolic* any-w2 boolean?)
+    ;; (assert (lub any-w2 ((curry f0) y w1) =>))
+    #;any-w2
+    (lub ((curry f0) y w1)))
   (define (f2 y)
-    (define-symbolic any-w1 boolean?)
-    (assert (lub any-w1 ((curry f1) y) =>))
-    any-w1)
+    ;; (define-symbolic* any-w1 boolean?)
+    ;; (assert (lub any-w1 ((curry f1) y) =>))
+    ;;any-w1
+    (lub ((curry f1) y)))
   (define (f3)
-    (define-symbolic any-y boolean?)
-    (assert (lub any-y f2 =>))
-    any-y)
+    ;; (define-symbolic* any-y boolean?)
+    ;; (assert (lub any-y f2 =>))
+    ;; any-y
+    (lub f2))
   (|| (E x z w) (f3)))
 
 ;; (define (S-27 R E x z)
-;;   (define (f0 w y w1 w2)
-;;     (&& (R x y w1)
-;;         (E y z w2)
-;;         (= w (+ w1 w2))))
-;;   (define (f1 w y w1)
-;;     (begin
-;;       (define-symbolic any-w2 boolean?)
-;;       (assert (lub any-w2 ((curry f0) w y w1) =>))
-;;       any-w2))
-;;   (define (f2 w y)
-;;     (begin
-;;       (define-symbolic any-w1 boolean?)
-;;       (assert (lub any-w1 ((curry f1) w y) =>))
-;;       any-w1))
-;;   (define (f3 w)
-;;     (begin
-;;       (define-symbolic any-y boolean?)
-;;       (assert (lub any-y ((curry f2) w) =>))
-;;       any-y))
-;;   (define (s0 w)
-;;     (t* (to-trop (|| (E x z w) (f3 w)))
+;;   (define (R-il R E x z w)
+;;     (define (f0 y w1 w2)
+;;       (&& (R x y w1)
+;;           (E y z w2)
+;;           (= w (+ w1 w2))))
+;;     (define (f1 y w1)
+;;       (lub ((curry f0) y w1)))
+;;     (define (f2 y)
+;;       (lub ((curry f1) y)))
+;;     (define (f3)
+;;       (lub f2))
+;;     (|| (E x z w) (f3)))
+;;   (define (f0 w)
+;;     (t* (to-trop (R-il R E x z w))
 ;;         (trop #f w)))
-;;   (define (s1)
-;;     (define-symbolic min-w27 integer?)
-;;     (assert (trop-lub (trop #f min-w27) s0))
-;;     min-w27)
-;;   (s1))
+;;   (define (f1)
+;;     (define-symbolic min-wS integer?)
+;;     (assert (trop-lub (trop #f min-wS) f0))
+;;     min-wS)
+;;   (f1))
 
 (define (S-27 R E x z)
     (define (f0 w y w1 w2)
@@ -143,33 +138,24 @@
           (E y z w2)
           (= w (+ w1 w2))))
     (define (f1 w y w1)
-      (begin
-        (define-symbolic any-w2 boolean?)
-        (assert (lub any-w2 ((curry f0) w y w1) =>))
-        any-w2))
+      (lub ((curry f0) w y w1)))
     (define (f2 w y)
-      (begin
-        (define-symbolic any-w1 boolean?)
-        (assert (lub any-w1 ((curry f1) w y) =>))
-        any-w1))
+      (lub ((curry f1) w y)))
     (define (f3 w)
-      (begin
-        (define-symbolic any-y boolean?)
-        (assert (lub any-y ((curry f2) w) =>))
-        (t* (to-trop any-y)
-            (trop #f w))))
+      (t* (to-trop (lub ((curry f2) w)))
+          (trop #f w)))
     (define (f4)
-      (define-symbolic min-w+ integer?)
+      (define-symbolic* min-w+ integer?)
       (assert (trop-lub (trop #f min-w+) f3))
       min-w+)
     (define (s0 w)
       (t* (to-trop (E x z w))
           (trop #f w)))
     (define (s1)
-      (define-symbolic min-w integer?)
+      (define-symbolic* min-w integer?)
       (assert (trop-lub (trop #f min-w) s0))
       min-w)
-    (s1)#;(min (s1) (f4)))
+    (min (s1) (f4)))
 
 ;; (define (rule-S-opt R E x z)
 ;;   (min (s-min
@@ -206,10 +192,13 @@
 ;;     (min (f1) (g2))))
 
 (define-symbolic R E (~> integer? integer? integer? boolean?))
-(define-symbolic x z w integer?)
+(define-symbolic x z integer?)
 
 (define S-out (rule-S R E x z))
 (define S-27-out (S-27 R E x z))
 
-(verify (assert (! (= S-27-out S-out))))
-(verify (assert (= S-27-out S-out)))
+
+(verify (assert #f))
+
+;; (verify (assert (! (= S-27-out S-out))))
+;; (verify (assert (= S-27-out S-out)))

@@ -256,4 +256,31 @@
   (define r (s_w1_x=q+w x w))
   (verify (assert (= r x))))
 
-(test-trivial)
+;; to_trop any_b R(b) = sum_b to_trop R(b)
+
+(define (trop_any_bRb R)
+  (define (f b)
+    (define-symbolic* any-b boolean?)
+    (assert (lub-b any-b R))
+    (to-trop any-b))
+  f)
+
+(define (sum_b_trop_Rb R)
+  (define (f b)
+    (define-symbolic* min-b integer?)
+    (assert (trop-lub (trop #f min-b)
+                      (lambda (b)
+                        (to-trop (R b)))))
+    (trop #f min-b))
+  f)
+
+(define (test-any-min)
+  (define-symbolic* b integer?)
+  (define-symbolic* R (~> integer? boolean?))
+  (define r1 ((trop_any_bRb R) b))
+  (define r2 ((sum_b_trop_Rb R) b))
+  (verify (assert (eq? r1 r2))))
+
+(test-any-min)
+
+;; sum_w any_b R(b) * S(w) = sum_b R(b) * sum_w S(w)

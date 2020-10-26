@@ -240,3 +240,20 @@
   (define r1 ((s_wR+s_wS R S) x y))
   (define r2 ((s_wR+S R S) x y))
   (verify (assert (= r1 r2))))
+
+;; x = sum_w 1_{x=w} + w
+
+(define (s_w1_x=q+w x w)
+  (define-symbolic* min-w integer?)
+  (assert (trop-lub (trop #f min-w)
+                    (lambda (w)
+                      (t* (trop #f w)
+                          (to-trop (= x w))))))
+  min-w)
+
+(define (test-trivial)
+  (define-symbolic w x integer?)
+  (define r (s_w1_x=q+w x w))
+  (verify (assert (= r x))))
+
+(test-trivial)

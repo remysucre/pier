@@ -96,8 +96,8 @@
 ;; b is an upperbound of f(w)
 
 (define (trop-ub b f)
-  (define-symbolic* w integer?)
-  (forall (list w) (t>= b (f w))))
+  (define-symbolic* m integer?)
+  (forall (list m) (t>= b (f m))))
 
 (define (test-trop-ub)
   (define (f n) (trop #f n))
@@ -318,11 +318,11 @@
 (define (S-17 R)
   (define (f)
     (define (f1 w)
-      (define-symbolic* any-u boolean?)
-      (assert (lub-b any-u (lambda (u) (R w u))))
-      (t* (to-trop any-u) (trop #f w)))
+      (define-symbolic any-u (~> integer? boolean?))
+      (assert (lub-b (any-u w) (lambda (u) (R w u))))
+      (t* (to-trop (any-u w))(trop #f w)))
     (define (f2)
-      (define-symbolic* min-w integer?)
+      (define-symbolic min-w integer?)
       (assert (trop-lub (trop #f min-w) f1))
       min-w)
     (f2))
@@ -333,24 +333,58 @@
     (define (f0 w u)
       (t* (trop #f w) (to-trop (R w u))))
     (define (f1 w)
-      (define-symbolic* min-u integer?)
-      (assert (trop-lub (trop #f min-u)
+      (define-symbolic min-u (~> integer? integer?))
+      (assert (trop-lub (trop #f (min-u w))
                         (lambda (u) (f0 w u))))
-      (trop #f min-u))
+      (trop #f (min-u w)))
     (define (f2)
-      (define-symbolic* min-w integer?)
+      (define-symbolic min-w integer?)
       (assert (trop-lub (trop #f min-w) f1))
       min-w)
     (f2))
   f)
 
 (define (test-17-18)
-  (define-symbolic* R (~> integer? integer? boolean?))
+  (define-symbolic R (~> integer? integer? boolean?))
   (define r1 ((S-17 R)))
-  (define r2 ((S-18 R)))
-  (verify (assert (eq? r1 r2))))
+  (asserts)
+  #;(define r2 ((S-18 R)))
+  #;(verify (assert (eq? r1 r2))))
 
 (test-17-18)
+
+;; (list
+;;  (&& (forall (m$0) (|| (! (app any-u m$0))
+;;                        (&& (app any-u m$0) (<= min-w (ite (app any-u m$0)
+;;                                                           (+ m$0 (ite (app any-u m$0) 0 1))
+;;                                                           1)))))
+;;      (forall (i$0 n$0) (|| (&& (! i$0) (<= n$0 min-w))
+;;                            (! (forall (m$1) (|| (! (app any-u m$1)) (&& (app any-u m$1) (&& (! i$0) (<= n$0 ...)))))))))
+;;  (&& (forall (w$2) (|| (app any-u m$1)
+;;                        (! (app R m$1 w$2))))
+;;      (forall (b$1) (|| (|| b$1 (! (app any-u m$1))) (! (forall (w$3) (|| b$1 (! (app R m$1 w$3))))))))
+;;  (&& (forall (w$0) (|| (app any-u m$0)
+;;                        (! (app R m$0 w$0))))
+;;      (forall (b$0) (|| (|| b$0 (! (app any-u m$0))) (! (forall (w$1) (|| b$0 (! (app R m$0 w$1)))))))))
+
+;; (list
+;;  (&& (forall (m$0) (|| (! any-u)
+;;                        (&& any-u
+;;                            (<= min-w (ite any-u
+;;                                           (+ m$0 (ite any-u 0 1))
+;;                                           1)))))
+;;      (forall (i$0 n$0) (|| (&& (! i$0) (<= n$0 min-w))
+;;                            (! (forall (m$1) (|| (! any-u)
+;;                                                 (&& any-u
+;;                                                     (&& (! i$0) (<= n$0 (ite any-u
+;;                                                                              (+ (ite any-u 0 1) m$1)
+;;                                                                              1))))))))))
+;;  (&& (forall (w$2) (|| any-u (! (app R m$1 w$2))))
+;;      (forall (b$1) (|| (|| (! any-u) b$1)
+;;                        (! (forall (w$3) (|| b$1 (! (app R m$1 w$3))))))))
+;;  (&& (forall (w$0) (|| any-u (! (app R m$0 w$0))))
+;;      (forall (b$0) (|| (|| b$0 (! any-u))
+;;                        (! (forall (w$1) (|| b$0 (! (app R m$0 w$1)))))))))
 
 ;; (list
 ;;  (&& (forall (w$0) (|| (! any-u$0)
@@ -367,11 +401,9 @@
 ;;  (&& (forall (w$2) (|| any-u$1 (! (app R$0 w$1 w$2))))
 ;;      (forall (b$1) (|| (|| b$1 (! any-u$1))
 ;;                        (! (forall (w$3) (|| b$1 (! (app R$0 w$1 w$3))))))))
-;;  (&& (forall (w$0) (|| any-u$0
-;;                        (! (app R$0 w$0 w$0))))
+;;  (&& (forall (w$0) (|| any-u$0 (! (app R$0 w$0 w$0))))
 ;;      (forall (b$0) (|| (|| b$0 (! any-u$0))
-;;                        (! (forall (w$1) (|| b$0
-;;                                             (! (app R$0 w$0 w$1)))))))))
+;;                        (! (forall (w$1) (|| b$0 (! (app R$0 w$0 w$1)))))))))
 
 ;; (list
 ;;  (&& (forall (w$0) (<= min-w$0 min-u$0))
@@ -383,9 +415,7 @@
 ;;                                             (+ w$3 (ite (app R$0 w$3 w$4) 0 1))
 ;;                                             1)))))
 ;;      (forall (i$2 n$2) (|| (&& (! i$2) (<= n$2 min-u$1))
-;;                            (! (forall (w$5) (|| (! (app R$0 w$3 w$5))
-;;                                                 (&& (app R$0 w$3 w$5)
-;;                                                     (&& ...))))))))
+;;                            (! (forall (w$5) (|| (! (app R$0 w$3 w$5)) (&& (app R$0 w$3 w$5) (&& ...))))))))
 ;;  (&& (forall (w$1) (|| (! (app R$0 w$0 w$1))
 ;;                        (&& (app R$0 w$0 w$1)
 ;;                            (<= min-u$0 (ite (app R$0 w$0 w$1)

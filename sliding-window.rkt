@@ -28,16 +28,13 @@
                             (I (< j t))))
                       (* w (I (>= j 1)))))))
 
-(define-symbolic n a b integer?)
-(assert (forall (list n a b) (=> (< n 1) (= 0 (R n a b)))))
-(assert (>= k 0))
-(assert (>= t 0))
-
 (verify (assert (= (* (* (R (- (- t k) 1) j w)
+                         (I (> k 0))
                          (* (I (> (- t k) 1))
                             (I (< j (- t k)))))
                       (* w (* (I (>= j 1)) (I (<= j (- t k))))))
                    (* (* (R (- (- t k) 1) j w) w)
+                      (I (> k 0))
                       (* (* (I (<= j (- (- t k) 1)))
                             (I (<= 1 j)))
                          (I (> t 1)))))))

@@ -86,7 +86,7 @@
     (to-num (<= j t)))
   (define (rhs j t)
     (- (to-num (<= (- j 1) t)) (to-num (= (- j 1) t))))
-  (verify (assert (= (lhs j t) (rhs j t)))))
+  (verify (assert (! (= (lhs j t) (rhs j t))))))
 
 (check-49)
 (check-50)
@@ -95,6 +95,6 @@
 (check-53)
 (check-80)
 (check-81)
-(check-82)
+(assert (unsat? (check-82)))
 
 ;; Lattice lemmas from 6.7

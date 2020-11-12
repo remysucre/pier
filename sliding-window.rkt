@@ -1,0 +1,29 @@
+#lang rosette
+
+(define (I b)
+  (if b 1 0))
+
+(define-symbolic j w t k integer?)
+(define-symbolic v (~> integer? integer? integer?))
+(define-symbolic R (~> integer? integer? integer? integer?))
+
+(verify (assert (= (* (* (v j w) (I (= t j)))
+                      (* w (* (I (>= j 1))
+                              (I (<= j t)))))
+                   (* (* (v j w) (I (= t j)))
+                      (* w (I (>= j 1)))))))
+
+(verify (assert (= (* (* (v j w) (I (= (- t k) j)))
+                      (* w (* (I (>= j 1))
+                              (I (<= j (- t k))))))
+                   (* (* (v j w) (I (= (- t k) j)))
+                      (* w (I (>= j 1)))))))
+
+(verify (assert (= (* (* (R (- t 1) j w)
+                         (* (I (> t 1))
+                            (I (< j t))))
+                      (* w (* (I (>= j 1)) (I (<= j t)))))
+                   (* (* (R (- t 1) j w)
+                         (* (I (> t 1))
+                            (I (< j t))))
+                      (* w (I (>= j 1)) )))))

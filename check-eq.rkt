@@ -55,7 +55,7 @@
                             (I (<= 1 (var j))))
                          (I (> (var t) 1)))))
 
-(equivalent? (* (* (rel v (var j) (var w)) (I (= (var t) (var j))))
+#;(equivalent? (* (* (rel v (var j) (var w)) (I (= (var t) (var j))))
                       (* (var w) (* (I (>= (var j) 1))
                               (I (<= (var j) (var t))))))
              (* (* (rel v (var j) (var w)) (I (= (var t) (var j))))

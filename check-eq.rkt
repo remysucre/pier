@@ -20,7 +20,7 @@
     [`(,op ,e ...) (apply set-union (map fvs e))]
     [else (list->set (set))]))
 
-(define-syntax (interp stx)
+(define-syntax (equivalent? stx)
   (syntax-parse stx
     [(_ e1 e2)
      (define vars (set->list (set-union (fvs (syntax->datum #`e1)) (fvs (syntax->datum #`e2)))))
@@ -31,4 +31,4 @@
          #,defs
          (verify (assert (= #,lhs #,rhs))))]))
 
-(interp (+ (var x) (var x)) (* 2 (var x)))
+(equivalent? (+ (var x) (var x)) (* 2 (var x)))

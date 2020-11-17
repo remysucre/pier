@@ -39,7 +39,7 @@
    js))
 
 (define (rule-S-opt v R t js ws)
-  (+ (* (to-num (> t 1)) (S v R (- t 1) js ws))
+  (+ (S v R (- t 1) js ws)
      ((s-sum
        (lambda (j)
          ((s-sum
@@ -52,6 +52,19 @@
           ws)))
       js)))
 
+(define (rule-S-out v R t js ws)
+  (+ (S v R (- t 1) js ws)
+     (vec-get v t)))
+
+(define (vec-get v t)
+  ((s-sum
+    (lambda (w)
+      (* w
+         (to-num
+          (&& (v t w)
+              (<= 1 t))))))
+   ws))
+
 (define-symbolic t tt j w integer?)
 (define-symbolic v (~> integer? integer? boolean?))
 (define-symbolic R (~> integer? integer? integer? boolean?))
@@ -60,7 +73,30 @@
 (define js (range N))
 (define ws (range N))
 
-(verify (assert (= (rule-S v R t js ws) (rule-S-opt v R t js ws))))
+(assert (<= 0 t))
+(assert (< t N))
+
+(verify (assert (= (rule-S v R t js ws) (rule-S-out v R t js ws))))
+
+(require rosette/lib/synthax)
+
+(define-synthax (semiring v R t js ws depth)
+  #:base (choose (S v R (- t 1) js ws) v R js ws t)
+  #:else (choose (S v R (- t 1) js ws) v R js ws t
+                 (+ (semiring v R t js ws (- depth 1))
+                    (semiring v R t js ws (- depth 1)))
+                 (vec-get (semiring v R t js ws (- depth 1))
+                          (semiring v R t js ws (- depth 1)))))
+
+(define (optimized v R t js ws)
+  (semiring v R t js ws 3))
+
+(define OPT
+  (synthesize
+   #:forall (list v R t)
+   #:guarantee (assert (= (optimized v R t js ws) (rule-S v R t js ws)))))
+
+(print-forms OPT)
 
 ;; (define (rule-S-58 v R t js ws)
 ;;   ((s-sum

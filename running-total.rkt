@@ -68,15 +68,17 @@
 ;; g.f = h.g
 (verify (assert (= (rule-S v R t js ws) (rule-S-opt v R t js ws))))
 
-;; grammar of semirings, with the hint to include S[t-1] in a terminal
+;; grammar of semirings
+;; op := + | - | vec-get
+;; terminal := v | R | js | ws | t | 1
+;; semiring := (op semiring semiring) | (S semiring) | terminal
 (define-synthax (semiring v R t js ws depth)
-  #:base (choose (S v R (- t 1) js ws)
-                 v R js ws t 1)
-  #:else (choose (S v R (- t 1) js ws)
-                 v R js ws t 1
+  #:base (choose v R js ws t 1)
+  #:else (choose v R js ws t 1
                  ((choose + - vec-get)
                   (semiring v R t js ws (- depth 1))
-                  (semiring v R t js ws (- depth 1)))))
+                  (semiring v R t js ws (- depth 1)))
+                 (S v R (semiring v R t js ws (- depth 1)) js ws)))
 
 (define (optimized v R t js ws)
   (semiring v R t js ws 3))

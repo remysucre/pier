@@ -17,26 +17,29 @@
          (I (&& (v t w)
                 (<= 1 t)))))))
 
+(define-symbolic v (~> integer? integer? boolean?))
+(define-symbolic R (~> integer? integer? integer? boolean?))
+
 ;; f
-(define (rule-R v R t j w)
+(define (rule-R t j w)
   (|| (&& (v j w) (= t j))
       (&& (R (- t 1) j w)
           (< j t)
           (> t 1))))
 
 ;; g.f
-(define (rule-S v R t)
+(define (rule-S t)
   (s-sum
     (lambda (j)
       (s-sum
         (lambda (w)
           (* w
-             (I (&& (rule-R v R t j w)
+             (I (&& (rule-R t j w)
                     (<= 1 j)
                     (<= j t)))))))))
 
 ;; g
-(define (S v R t)
+(define (S t)
   (s-sum
     (lambda (j)
       (s-sum
@@ -47,38 +50,36 @@
                     (<= j t)))))))))
 
 ;; h.g (to be synthesized)
-(define (rule-S-opt v R t)
-  (+ (S v R (- t 1))
+(define (rule-S-opt t)
+  (+ (S (- t 1))
      (vec-get v t)))
 
 (define-symbolic t integer?)
-(define-symbolic v (~> integer? integer? boolean?))
-(define-symbolic R (~> integer? integer? integer? boolean?))
 
 (assert (<= 0 t))
 (assert (< t N))
 
 ;; g.f = h.g
-(verify (assert (= (rule-S v R t) (rule-S-opt v R t))))
+(verify (assert (= (rule-S t) (rule-S-opt t))))
 
 ;; grammar of semirings
 ;; op := + | - | vec-get
 ;; terminal := v | t | number
 ;; semiring := (op semiring semiring) | (S semiring) | terminal
-(define-synthax (semiring v R t depth)
+(define-synthax (semiring v t depth)
   #:base (choose v t (??))
   #:else (choose v t (??)
                  ((choose + - vec-get)
-                  (semiring v R t (- depth 1))
-                  (semiring v R t (- depth 1)))
-                 (S v R (semiring v R t (- depth 1)))))
+                  (semiring v t (- depth 1))
+                  (semiring v t (- depth 1)))
+                 (S (semiring v t (- depth 1)))))
 
-(define (optimized v R t)
-  (semiring v R t 3))
+(define (optimized v t)
+  (semiring v t 3))
 
 (define OPT
   (synthesize
    #:forall (list v R t)
-   #:guarantee (assert (= (optimized v R t) (rule-S v R t)))))
+   #:guarantee (assert (= (optimized v t) (rule-S t)))))
 
 (print-forms OPT)

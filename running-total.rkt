@@ -3,19 +3,19 @@
 
 ;; bound for model checking
 (define N 4)
+(define ws (list 0 1 2 3))
+
+(define (s-sum f)
+  (apply + (map f ws)))
 
 (define (I b) (if b 1 0))
 
-(define (s-sum f)
-  (lambda (w) (apply + (map f w))))
-
 (define (vec-get v t)
-  ((s-sum
+  (s-sum
     (lambda (w)
       (* w
          (I (&& (v t w)
-                (<= 1 t))))))
-   ws))
+                (<= 1 t)))))))
 
 ;; f
 (define (rule-R v R t j w)
@@ -25,67 +25,60 @@
           (> t 1))))
 
 ;; g.f
-(define (rule-S v R t js ws)
-  ((s-sum
+(define (rule-S v R t)
+  (s-sum
     (lambda (j)
-      ((s-sum
+      (s-sum
         (lambda (w)
           (* w
              (I (&& (rule-R v R t j w)
                     (<= 1 j)
-                    (<= j t))))))
-       ws)))
-   js))
+                    (<= j t)))))))))
 
 ;; g
-(define (S v R t js ws)
-  ((s-sum
+(define (S v R t)
+  (s-sum
     (lambda (j)
-      ((s-sum
+      (s-sum
         (lambda (w)
           (* w
              (I (&& (R t j w)
                     (<= 1 j)
-                    (<= j t))))))
-       ws)))
-   js))
+                    (<= j t)))))))))
 
 ;; h.g (to be synthesized)
-(define (rule-S-opt v R t js ws)
-  (+ (S v R (- t 1) js ws)
+(define (rule-S-opt v R t)
+  (+ (S v R (- t 1))
      (vec-get v t)))
 
 (define-symbolic t integer?)
 (define-symbolic v (~> integer? integer? boolean?))
 (define-symbolic R (~> integer? integer? integer? boolean?))
 
-(define js (range N))
-(define ws (range N))
-
 (assert (<= 0 t))
 (assert (< t N))
 
 ;; g.f = h.g
-(verify (assert (= (rule-S v R t js ws) (rule-S-opt v R t js ws))))
+(verify (assert (= (rule-S v R t) (rule-S-opt v R t))))
 
 ;; grammar of semirings
 ;; op := + | - | vec-get
-;; terminal := v | R | js | ws | t | 1
+;; terminal := v | R | t | 1
 ;; semiring := (op semiring semiring) | (S semiring) | terminal
-(define-synthax (semiring v R t js ws depth)
-  #:base (choose v R js ws t 1)
-  #:else (choose v R js ws t 1
+(define-synthax (semiring v R t depth)
+  #:base (choose (S v R (- t 1)) (vec-get v t))
+  #:else (choose (S v R (- t 1)) (vec-get v t)
                  ((choose + - vec-get)
-                  (semiring v R t js ws (- depth 1))
-                  (semiring v R t js ws (- depth 1)))
-                 (S v R (semiring v R t js ws (- depth 1)) js ws)))
+                  (semiring v R t (- depth 1))
+                  (semiring v R t (- depth 1)))
+                 #;(S v R (semiring v R t (- depth 1)))))
 
-(define (optimized v R t js ws)
-  (semiring v R t js ws 3))
+(define (optimized v R t)
+  (semiring v R t 3))
 
 (define OPT
   (synthesize
    #:forall (list v R t)
-   #:guarantee (assert (= (optimized v R t js ws) (rule-S v R t js ws)))))
+   #:guarantee (assert (= (optimized v R t) (rule-S v R t)))))
 
 (print-forms OPT)

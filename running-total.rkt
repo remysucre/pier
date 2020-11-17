@@ -63,15 +63,15 @@
 
 ;; grammar of semirings
 ;; op := + | - | vec-get
-;; terminal := v | R | t | 1
+;; terminal := v | t | number
 ;; semiring := (op semiring semiring) | (S semiring) | terminal
 (define-synthax (semiring v R t depth)
-  #:base (choose (S v R (- t 1)) (vec-get v t))
-  #:else (choose (S v R (- t 1)) (vec-get v t)
+  #:base (choose v t (??))
+  #:else (choose v t (??)
                  ((choose + - vec-get)
                   (semiring v R t (- depth 1))
                   (semiring v R t (- depth 1)))
-                 #;(S v R (semiring v R t (- depth 1)))))
+                 (S v R (semiring v R t (- depth 1)))))
 
 (define (optimized v R t)
   (semiring v R t 3))

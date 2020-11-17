@@ -66,20 +66,19 @@
 ;; op := + | - | vec-get
 ;; terminal := v | t | number
 ;; semiring := (op semiring semiring) | (S semiring) | terminal
-(define-synthax (semiring v t depth)
+(define-synthax (semiring t depth)
   #:base (choose v t (??))
   #:else (choose v t (??)
                  ((choose + - vec-get)
-                  (semiring v t (- depth 1))
-                  (semiring v t (- depth 1)))
-                 (S (semiring v t (- depth 1)))))
+                  (semiring t (- depth 1))
+                  (semiring t (- depth 1)))
+                 (S (semiring t (- depth 1)))))
 
-(define (optimized v t)
-  (semiring v t 3))
+(define (optimized t) (semiring t 3))
 
 (define OPT
   (synthesize
    #:forall (list v R t)
-   #:guarantee (assert (= (optimized v t) (rule-S t)))))
+   #:guarantee (assert (= (optimized t) (rule-S t)))))
 
 (print-forms OPT)

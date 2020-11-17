@@ -1,15 +1,15 @@
 #lang rosette
 (require rosette/lib/synthax)
 
-;; bound for model checking
+;; Bound for verification
 (define N 4)
-(define ws (list 0 1 2 3))
+(define ws (range N))
 
-(define (s-sum f)
-  (apply + (map f ws)))
+(define (s-sum f) (apply + (map f ws)))
 
 (define (I b) (if b 1 0))
 
+;; v[t] = SUM_w v(t,w) * w * 1_t>=1
 (define (vec-get v t)
   (s-sum
     (lambda (w)
@@ -20,14 +20,14 @@
 (define-symbolic v (~> integer? integer? boolean?))
 (define-symbolic R (~> integer? integer? integer? boolean?))
 
-;; f
+;; f(R)
 (define (rule-R t j w)
   (|| (&& (v j w) (= t j))
       (&& (R (- t 1) j w)
           (< j t)
           (> t 1))))
 
-;; g.f
+;; g(f(R))
 (define (rule-S t)
   (s-sum
     (lambda (j)
@@ -38,7 +38,7 @@
                     (<= 1 j)
                     (<= j t)))))))))
 
-;; g
+;; g(R)
 (define (S t)
   (s-sum
     (lambda (j)
@@ -49,20 +49,21 @@
                     (<= 1 j)
                     (<= j t)))))))))
 
-;; h.g (to be synthesized)
+;; h(g(R)) (h to be synthesized)
 (define (rule-S-opt t)
   (+ (S (- t 1))
      (vec-get v t)))
 
 (define-symbolic t integer?)
 
+;; Necessary for bounded verification
 (assert (<= 0 t))
 (assert (< t N))
 
 ;; g.f = h.g
 (verify (assert (= (rule-S t) (rule-S-opt t))))
 
-;; grammar of semirings
+;; Grammar of semirings
 ;; op := + | - | vec-get
 ;; terminal := v | t | number
 ;; semiring := (op semiring semiring) | (S semiring) | terminal

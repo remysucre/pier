@@ -25,10 +25,10 @@
   (if (= 0 depth)
       (apply choose* terminals)
       (apply choose*
-             (append (list (plus (??expr terminals (- depth 1))
+             (append terminals
+                     (list (plus (??expr terminals (- depth 1))
                                  (??expr terminals (- depth 1)))
-                           (square (??expr terminals (- depth 1))))
-                     terminals))))
+                           (square (??expr terminals (- depth 1))))))))
 
 ; Create a sketch representing all programs of the form (plus ?? ??),
 ; where the ??s are unknown expressions created by ??expr.
@@ -38,7 +38,10 @@
 (define M
   (synthesize
     #:forall (list x)
-    #:guarantee (assert (= (interpret sketch) (interpret (mul 8 x))))))
+    #:guarantee (assert (= (interpret sketch)
+                           (interpret (plus (mul 3 x)
+                                            (mul (mul x x)
+                                                 (mul x x))))))))
 
 
 ; Substitute the bindings in M into the sketch to get back the

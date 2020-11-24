@@ -75,26 +75,6 @@
 
 ;; (verify (assert (= (rule-S t k) (rule-S-opt t k))))
 
-;; Grammar of semirings
-;; op := + | - | vec-get
-;; terminal := v | t | k | number
-;; semiring := (op semiring semiring) | (S semiring semiring) | terminal
-;; (define-synthax (semiring t k depth)
-;;   #:base (choose v t k (??))
-;;   #:else (choose v t k (??)
-;;                  ((choose + -)
-;;                   (semiring t k (- depth 1))
-;;                   (semiring t k (- depth 1)))
-;;                  (vec-get v (choose t k (??)
-;;                                     ((choose + -) (choose t k (??))
-;;                                                   (choose t k (??)))))
-;;                  (S (choose t k (??)
-;;                             ((choose + -) (choose t k (??))
-;;                                           (choose t k (??))))
-;;                     (choose t k (??)
-;;                             ((choose + -) (choose t k (??))
-;;                                           (choose t k (??)))))))
-
 (struct sub (left right) #:transparent)
 (struct plus (left right) #:transparent)
 (struct v-get (left right) #:transparent)
@@ -118,7 +98,7 @@
 ;; vec := v
 (define (??vec) (choose* v))
 
-;; var := t
+;; var := t | k
 (define (??var) (choose* t k))
 
 ;; atom := var | number
@@ -153,13 +133,3 @@
    #:guarantee (assert (= (interpret sketch) (rule-S t k)))))
 
 (evaluate sketch M)
-
-
-;; (define (optimized t k) (semiring t k 3))
-
-;; (define OPT
-;;   (synthesize
-;;    #:forall (list v R t k)
-;;    #:guarantee (assert (= (optimized t k) (rule-S t k)))))
-
-;; (print-forms OPT)

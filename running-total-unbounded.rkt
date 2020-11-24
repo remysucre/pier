@@ -5,6 +5,7 @@
 
 (define (I b) (if b 1 0))
 
+;; TODO need to normalize
 
 ;; v[t] = SUM_w v(t,w) * w * 1_t>=1
 (define (vec-get v t)

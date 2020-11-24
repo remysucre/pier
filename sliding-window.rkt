@@ -50,12 +50,12 @@
 
 ;; g(f(R))
 (define (rule-S t k)
-  (- (rule-prefix t) (rule-prefix (- t k)) #;(* (rule-prefix (- t k)) (I (> k 0)))))
+  (- (rule-prefix t) (rule-prefix (- t k))))
 
 
 ;; g(R)
 (define (S t k)
-  (- (prefix t) (prefix (- t k)) #;(* (prefix (- t k)) (I (> k 0)))))
+  (- (prefix t) (prefix (- t k))))
 
 ;; h(g(R)) (h to be synthesized)
 (define (rule-S-opt t k)
@@ -71,8 +71,33 @@
 
 (assert (> k 0))
 
-(define sol (verify (assert (= (rule-S t k) (rule-S-opt t k)))))
+(verify (assert (= (rule-S t k) (rule-S-opt t k))))
 
-;; (evaluate (rule-S t k) sol)
-;; (evaluate (rule-S-opt t k) sol)
-sol
+;; Grammar of semirings
+;; op := + | - | vec-get
+;; terminal := v | t | k | number
+;; semiring := (op semiring semiring) | (S semiring semiring) | terminal
+(define-synthax (semiring t k depth)
+  #:base (choose v t k (??))
+  #:else (choose v t k (??)
+                 ((choose + -)
+                  (semiring t k (- depth 1))
+                  (semiring t k (- depth 1)))
+                 (vec-get v (choose t k (??)
+                                    ((choose + -) (choose t k (??))
+                                                  (choose t k (??)))))
+                 (S (choose t k (??)
+                            ((choose + -) (choose t k (??))
+                                          (choose t k (??))))
+                    (choose t k (??)
+                            ((choose + -) (choose t k (??))
+                                          (choose t k (??)))))))
+
+(define (optimized t k) (semiring t k 3))
+
+(define OPT
+  (synthesize
+   #:forall (list v R t k)
+   #:guarantee (assert (= (optimized t k) (rule-S t k)))))
+
+(print-forms OPT)

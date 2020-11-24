@@ -1,5 +1,6 @@
 #lang rosette
-(require rosette/lib/synthax)
+(require rosette/lib/angelic
+         rosette/lib/synthax)
 
 ;; Bound for verification
 (define N 4)
@@ -67,19 +68,41 @@
 ;; op := + | - | vec-get
 ;; terminal := v | t | number
 ;; semiring := (op semiring semiring) | (S semiring) | terminal
-(define-synthax (semiring t depth)
-  #:base (choose v t (??))
-  #:else (choose v t (??)
-                 ((choose + - vec-get)
-                  (semiring t (- depth 1))
-                  (semiring t (- depth 1)))
-                 (S (semiring t (- depth 1)))))
+;; (define-synthax (semiring t depth)
+;;   #:base (choose v t (??))
+;;   #:else (choose v t (??)
+;;                  ((choose + - vec-get)
+;;                   (semiring t (- depth 1))
+;;                   (semiring t (- depth 1)))
+;;                  (S (semiring t (- depth 1)))))
 
-(define (optimized t) (semiring t 3))
+(define (??expr t depth)
+  (if (= depth 0)
+      (choose* t (??))
+      (choose* t (??)
+              ((choose* + -)
+               (??expr (- depth 1))
+               (??expr (- depth 1))))))
+
+(define (??term t depth)
+  (if (= depth 0)
+      (??expr t depth)
+      (choose* (??expr t depth)
+               (vec-get v (??expr t (- depth 1)))
+               ((choose* + -) (??term t (- depth 1))
+                              (??term t (- depth 1)))
+               (S (??expr t (- depth 1))))))
+
+(define (optimized t) (??expr t 0))
+
+#;(define OPT
+  (synthesize
+   #:forall (list v R t)
+   #:guarantee (assert (= (optimized t) (rule-S t)))))
 
 (define OPT
   (synthesize
    #:forall (list v R t)
-   #:guarantee (assert (= (optimized t) (rule-S t)))))
+   #:guarantee (assert (= (optimized t) t))))
 
 (print-forms OPT)

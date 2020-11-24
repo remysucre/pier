@@ -1,6 +1,8 @@
 #lang rosette
 
-(require rosette/lib/synthax)
+(require rosette/lib/angelic    ; provides `choose*`
+         rosette/lib/synthax    ; provides `??`
+         rosette/lib/destruct)  ; provides `destruct`
 
 ;; Bound for verification
 (define N 4)
@@ -71,33 +73,93 @@
 
 (assert (> k 0))
 
-(verify (assert (= (rule-S t k) (rule-S-opt t k))))
+;; (verify (assert (= (rule-S t k) (rule-S-opt t k))))
 
 ;; Grammar of semirings
 ;; op := + | - | vec-get
 ;; terminal := v | t | k | number
 ;; semiring := (op semiring semiring) | (S semiring semiring) | terminal
-(define-synthax (semiring t k depth)
-  #:base (choose v t k (??))
-  #:else (choose v t k (??)
-                 ((choose + -)
-                  (semiring t k (- depth 1))
-                  (semiring t k (- depth 1)))
-                 (vec-get v (choose t k (??)
-                                    ((choose + -) (choose t k (??))
-                                                  (choose t k (??)))))
-                 (S (choose t k (??)
-                            ((choose + -) (choose t k (??))
-                                          (choose t k (??))))
-                    (choose t k (??)
-                            ((choose + -) (choose t k (??))
-                                          (choose t k (??)))))))
+;; (define-synthax (semiring t k depth)
+;;   #:base (choose v t k (??))
+;;   #:else (choose v t k (??)
+;;                  ((choose + -)
+;;                   (semiring t k (- depth 1))
+;;                   (semiring t k (- depth 1)))
+;;                  (vec-get v (choose t k (??)
+;;                                     ((choose + -) (choose t k (??))
+;;                                                   (choose t k (??)))))
+;;                  (S (choose t k (??)
+;;                             ((choose + -) (choose t k (??))
+;;                                           (choose t k (??))))
+;;                     (choose t k (??)
+;;                             ((choose + -) (choose t k (??))
+;;                                           (choose t k (??)))))))
 
-(define (optimized t k) (semiring t k 3))
+(struct sub (left right) #:transparent)
+(struct plus (left right) #:transparent)
+(struct v-get (left right) #:transparent)
+(struct rel-S (t k) #:transparent)
 
-(define OPT
+; Interpreter for our DSL.
+; We just recurse on the program's syntax using pattern matching.
+(define (interpret p)
+  (destruct p
+    [(plus a b)  (+ (interpret a) (interpret b))]
+    [(sub a b)  (- (interpret a) (interpret b))]
+    [(v-get a b)  (vec-get (interpret a) (interpret b))]
+    [(rel-S t k)  (S (interpret t) (interpret k))]
+    [_ p]))
+
+;; Grammar of semirings
+
+;; op := + | -
+(define (??op) (choose* plus sub))
+
+;; vec := v
+(define (??vec) (choose* v))
+
+;; var := t
+(define (??var) (choose* t k))
+
+;; atom := var | number
+(define (??atom) (choose* (??var) (??)))
+
+;; expr := atom | (op expr expr)
+(define (??expr depth)
+  (if (= depth 0)
+      (choose* (??atom))
+      (choose* (??atom)
+               ((??op) (??expr (- depth 1))
+                       (??expr (- depth 1))))))
+
+;; term := (v-get v expr) | (op term term) | (S expr expr)
+;; depth cannot be less than 1
+(define (??term t-depth e-depth)
+  (if (= t-depth 1)
+      (choose* (v-get v (??expr e-depth))
+               (rel-S (??expr e-depth)
+                      (??expr e-depth)))
+      (choose* (v-get v (??expr e-depth))
+               (rel-S (??expr e-depth)
+                      (??expr e-depth))
+               ((??op) (??term (- t-depth 1) e-depth)
+                       (??term (- t-depth 1) e-depth)))))
+
+(define sketch (??term 3 1))
+
+(define M
   (synthesize
    #:forall (list v R t k)
-   #:guarantee (assert (= (optimized t k) (rule-S t k)))))
+   #:guarantee (assert (= (interpret sketch) (rule-S t k)))))
 
-(print-forms OPT)
+(evaluate sketch M)
+
+
+;; (define (optimized t k) (semiring t k 3))
+
+;; (define OPT
+;;   (synthesize
+;;    #:forall (list v R t k)
+;;    #:guarantee (assert (= (optimized t k) (rule-S t k)))))
+
+;; (print-forms OPT)

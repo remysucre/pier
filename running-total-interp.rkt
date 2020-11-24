@@ -103,6 +103,7 @@
                        (??expr (- depth 1))))))
 
 ;; term := (v-get v expr) | (op term term) | (S expr)
+;; depth cannot be less than 1
 (define (??term depth)
   (if (= depth 1)
       (choose* (v-get v (??expr (- depth 1)))

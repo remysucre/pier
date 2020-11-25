@@ -5,6 +5,12 @@
 (define (to-int b)
   (if b 0 BIG))
 
+(define (weight E x z ws)
+  (s-min
+   (lambda (w)
+     (+ (to-int (E x z w)) w))
+   ws))
+
 (define (s-any f xs)
   (apply || (map f xs)))
 
@@ -36,14 +42,22 @@
 (define (S R x z ws)
   (s-min (lambda (w) (+ (to-int (R x z w)) w)) ws))
 
+;; (define (rule-S-opt R E x z ws ys w1s w2s)
+;;   (min (s-min (lambda (w) (+ w (to-int (E x z w)))) ws)
+;;        (s-min
+;;         (lambda (y)
+;;           (+ (S R x y w1s)
+;;              (s-min
+;;               (lambda (w2)
+;;                 (+ (to-int (E y z w2)) w2)) w2s)))
+;;         ys)))
+
 (define (rule-S-opt R E x z ws ys w1s w2s)
-  (min (s-min (lambda (w) (+ w (to-int (E x z w)))) ws)
+  (min (weight E x z ws)
        (s-min
         (lambda (y)
           (+ (S R x y w1s)
-             (s-min
-              (lambda (w2)
-                (+ (to-int (E y z w2)) w2)) w2s)))
+             (weight E y z w2s)))
         ys)))
 
 (define-symbolic R E (~> integer? integer? integer? boolean?))

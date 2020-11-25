@@ -5,11 +5,11 @@
 (define (I b)
   (if b 0 BIG))
 
-(define (weight E x z ws)
+(define (weight E x z ws-1)
   (s-min
    (lambda (w)
      (+ (I (E x z w)) w))
-   ws))
+   ws-1))
 
 (define (s-any f xs)
   (apply || (map f xs)))
@@ -17,7 +17,7 @@
 (define (s-min f xs)
   (apply min (map f xs)))
 
-(define (rule-R R E x z w ys w1s w2s)
+(define (rule-R R E x z w ws-2)
   (|| (E x z w)
       (s-any
        (lambda (y)
@@ -28,35 +28,33 @@
                (&& (R x y w1)
                    (E y z w2)
                    (= w (+ w1 w2))))
-             w2s))
-          w1s))
-       ys)))
+             ws-2))
+          ws-2))
+       ws-2)))
 
-(define (rule-S R E x z ws ys w1s w2s)
+(define (rule-S R E x z ws-1 ws-2)
   (s-min
    (lambda (w)
-     (+ (I (rule-R R E x z w ys w1s w2s))
+     (+ (I (rule-R R E x z w ws-2))
         w))
-   ws))
+   ws-1))
 
-(define (S R x z ws)
-  (s-min (lambda (w) (+ (I (R x z w)) w)) ws))
+(define (S R x z ws-1)
+  (s-min (lambda (w) (+ (I (R x z w)) w)) ws-1))
 
-(define (rule-S-opt R E x z ws ys w1s w2s)
-  (min (weight E x z ws)
+(define (rule-S-opt R E x z ws-1 ws-2)
+  (min (weight E x z ws-1)
        (s-min
         (lambda (y)
-          (+ (S R x y w1s)
-             (weight E y z w2s)))
-        ys)))
+          (+ (S R x y ws-2)
+             (weight E y z ws-2)))
+        ws-2)))
 
 (define-symbolic R E (~> integer? integer? integer? boolean?))
 (define-symbolic x z integer?)
 
-(define ys (range 4))
-(define ws (range 8))
-(define w1s (range 4))
-(define w2s (range 4))
+(define ws-1 (range 8))
+(define ws-2 (range 4))
 
-(verify (assert (= (rule-S R E x z ws ys w1s w2s)
-                   (rule-S-opt R E x z ws ys w1s w2s))))
+(verify (assert (= (rule-S R E x z ws-1 ws-2)
+                   (rule-S-opt R E x z ws-1 ws-2))))

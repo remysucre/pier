@@ -70,65 +70,61 @@
     [_ p]))
 
 (define (normalize p)
-  (match p
+  (destruct p
     [(mul a b) (let ([x (normalize a)]
                      [y (normalize b)])
-                 (match x
+                 (destruct x
                    [(plus l r) (plus (normalize (mul l y))
                                      (normalize (mul r y)))]
                    [_ (mul x y)]))]
     [(agg i e) (let ([x (normalize e)])
-                 (match x
+                 (destruct x
                    [(plus l r) (plus (normalize (agg i l))
                                      (normalize (agg i r)))]
                    [_ (agg i x)]))]
     [_ p]))
 
-(verify (assert (= (interpret (normalize (rule-S-opt t)))
-                   (interpret (normalize (rule-S t))))))
+;; (verify (assert (= (interpret (normalize (rule-S-opt t)))
+;;                    (interpret (normalize (rule-S t))))))
 
-;; ;; Grammar of semirings
+;; Grammar of semirings
 
-;; ;; op := + | -
-;; (define (??op) (choose* plus sub))
+;; op := + | -
+(define (??op) (choose* plus sub))
 
-;; ;; vec := v
-;; (define (??vec) (choose* v))
+;; vec := v
+(define (??vec) (choose* v))
 
-;; ;; var := t
-;; (define (??var) (choose* t))
+;; var := t
+(define (??var) (choose* t))
 
-;; ;; atom := var | number
-;; (define (??atom) (choose* (??var) (??)))
+;; atom := var | number
+(define (??atom) (choose* (??var) (??)))
 
-;; ;; expr := atom | (op expr expr)
-;; (define (??expr depth)
-;;   (if (= depth 0)
-;;       (choose* (??atom))
-;;       (choose* (??atom)
-;;                ((??op) (??expr (- depth 1))
-;;                        (??expr (- depth 1))))))
+;; expr := atom | (op expr expr)
+(define (??expr depth)
+  (if (= depth 0)
+      (choose* (??atom))
+      (choose* (??atom)
+               ((choose* + -) (??expr (- depth 1))
+                              (??expr (- depth 1))))))
 
-;; ;; term := (v-get v expr) | (op term term) | (S expr)
-;; (define (??term depth)
-;;   (if (= depth 1)
-;;       (choose* (v-get v (??expr (- depth 1)))
-;;                (rel-S (??expr (- depth 1))))
-;;       (choose* (v-get v (??expr (- depth 1)))
-;;                (rel-S (??expr (- depth 1)))
-;;                ((??op) (??term (- depth 1))
-;;                        (??term (- depth 1))))))
+;; term := (v-get v expr) | (op term term) | (S expr)
+(define (??term depth)
+  (if (= depth 1)
+      (choose* (vec-get v (??expr (- depth 1)))
+               (S (??expr (- depth 1))))
+      (choose* (vec-get v (??expr (- depth 1)))
+               (S (??expr (- depth 1)))
+               ((??op) (??term (- depth 1))
+                       (??term (- depth 1))))))
 
-;; ;; (define sketch (??term 3))
-;; (define sketch (plus (S ((??op) t 1))
-;;                      (vec-get v t)))
+(define sketch (??term 3))
 
-;; (define M
-;;   (synthesize
-;;    #:forall (list v R t j w sigma)
-;;    #:guarantee (assert (= (interpret (normalize sketch))
-;;                           (interpret (normalize (rule-S t)))))))
+(define M
+  (synthesize
+   #:forall (list v R t j w sigma)
+   #:guarantee (assert (= (interpret (normalize sketch))
+                          (interpret (normalize (rule-S t)))))))
 
-;; (evaluate sketch M)
-
-;; M
+(evaluate sketch M)

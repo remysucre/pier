@@ -1,19 +1,23 @@
-#lang rosette
+#lang rosette/safe
 
-(require rosette/lib/angelic    ; provides `choose*`
-         rosette/lib/synthax    ; provides `??`
-         rosette/lib/destruct)  ; provides `destruct`
+(require rosette/lib/destruct)
 
-(define-symbolic x y z a integer?)
+(struct fn (var e) #:transparent)
+(struct plus (x y) #:transparent)
 
-(define sketch (choose* (lambda (x) x)
-                        (lambda (y) x)
-                        (lambda (z) x)))
+(define (interpret p env)
+  (destruct p
+    [(fn var e)
+     (lambda (x) (interpret e (cons (cons var x) env)))]
+    [(plus x y) (+ (interpret x env) (interpret y env))]
+    [_ (define result (assoc p env))
+       (cond
+         [result (cdr result)]
+         [else (assert #f "free-var")])]))
 
-(define M
-  (synthesize
-   #:forall (list a x y z)
-   #:guarantee (assert (= (sketch a)
-                          ((lambda (x) x) a)))))
+((interpret (fn 'x (plus 'x 'x)) '()) 4)
 
-(evaluate (sketch 9) M)
+(define-symbolic x integer?)
+
+(verify (assert (= ((interpret (fn 'x (plus 'x 'x)) '()) x)
+                   ((interpret (fn 'y (plus 'y 'y)) '()) x))))

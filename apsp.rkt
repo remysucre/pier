@@ -2,7 +2,7 @@
 
 (require rosette/lib/angelic    ; provides `choose*`
          rosette/lib/synthax    ; provides `??`
-         rosette/lib/destruct)  ; provides `destruct`
+         rosette/lib/destruct)  ; provipes `destruct`
 
 (define BIG 99999999)
 
@@ -74,30 +74,57 @@
 (define ws-1 (range 8))
 (define ws-2 (range 4))
 
-(verify (assert (= (rule-S R E x z ws-1 ws-2)
-                   (rule-S-opt R E x z ws-1 ws-2))))
+(define fvs
+  (list (cons 'R R)
+        (cons 'E E)
+        (cons 'x x)
+        (cons 'y y)
+        (cons 'z z)
+        (cons 'ws-1 ws-1)
+        (cons 'ws-2 ws-2)))
 
-(define sketch (min (weight E x z ws-1)
-                             (s-min
-                              (choose* (lambda (x) (+ (S R x y ws-2)
-                                                      (weight E y z ws-2)))
-                                       (lambda (y) (+ (S R x y ws-2)
-                                                      (weight E y z ws-2)))
-                                       (lambda (z) (+ (S R x y ws-2)
-                                                      (weight E y z ws-2))))
+(struct op-weight (E x y ws) #:transparent)
+(struct rel-S (R x y ws) #:transparent)
+(struct op-smin (f ws) #:transparent)
+(struct op-min (x y) #:transparent)
+(struct op-plus (x y) #:transparent)
+(struct fn (var e) #:transparent)
 
-                              ws-2)))
+(define (interpret p env)
+  (destruct p
+    [(fn var e)
+     (lambda (x)
+       (interpret e (cons (cons var x) env)))]
+    [(op-plus x y)
+     (+ (interpret x env)
+        (interpret y env))]
+    [(op-min x y)
+     (min (interpret x env)
+          (interpret y env))]
+    [(op-smin f ws)
+     (s-min (interpret f env)
+            (interpret ws env))]
+    [(rel-S R x y ws)
+     (S (interpret R env)
+        (interpret x env)
+        (interpret y env)
+        (interpret ws env))]
+    [(op-weight E x y ws)
+     (weight (interpret E env)
+             (interpret x env)
+             (interpret y env)
+             (interpret ws env))]
+    [_ (define result (assoc p env))
+       (cond
+         [result (cdr result)]
+         [else (cdr (assoc p fvs))])]))
 
-(assert (forall (list y z)
-                (< (weight E y z ws-1) 20)))
+(define sketch
+  (op-min (op-weight 'E 'x 'z 'ws-1)
+          (op-smin
+           (fn 'y
+             (op-plus (rel-S 'R 'x 'y 'ws-2)
+                      (op-weight 'E 'y 'z 'ws-2)))
+           'ws-2)))
 
-(assert (forall (list y z)
-                (< (weight E y z ws-2) 20)))
-
-(define M
-  (synthesize
-   #:forall (list R E x y z)
-   #:guarantee (assert (= sketch
-                          (rule-S R E x z ws-1 ws-2)))))
-
-(evaluate sketch M)
+(verify (assert (= (interpret sketch '()) (rule-S R E x z ws-1 ws-2))))

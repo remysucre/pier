@@ -54,19 +54,27 @@
              (weight E y z ws-2)))
         ws-2)))
 
-(define (??var) (choose* x z))
+(define (??var) (choose* 'x 'y 'z))
 
-(define (??ws) (choose* ws-1 ws-2))
+(define (??ws) (choose* 'ws-1 'ws-2))
 
-(define (??op) (choose* + min))
+(define (??op) (choose* op-plus op-min))
 
-;; (define (??term depth)
-;;   (if (= depth 1)
-;;       (choose* (S R (??var) (??var) (??ws))
-;;                (weight E (??var) (??var) (??ws)))
-;;       (choose* ((??op) (??term (- depth 1))
-;;                        (??term (- depth 1)))
-;;                (s-min (lambda ((??var)) (??term (- depth 1)))))))
+(define (??term depth)
+  (if (= depth 1)
+      (choose* (rel-S 'R (??var) (??var) (??ws))
+               (op-weight 'E (??var) (??var) (??ws)))
+      (choose* ((??op) (??term (- depth 1))
+                       (??term (- depth 1)))
+               (op-smin (fn (??var) (??term (- depth 1))) (??ws)))))
+
+;; (define sketch
+;;   (op-min (op-weight 'E 'x 'z 'ws-1)
+;;           (op-smin
+;;            (fn 'y
+;;              (op-plus (rel-S 'R 'x 'y 'ws-2)
+;;                       (op-weight 'E 'y 'z 'ws-2)))
+;;            'ws-2)))
 
 (define-symbolic R E (~> integer? integer? integer? boolean?))
 (define-symbolic x y z integer?)
@@ -89,6 +97,13 @@
 (struct op-min (x y) #:transparent)
 (struct op-plus (x y) #:transparent)
 (struct fn (var e) #:transparent)
+
+(define sketch
+  ((??op) (??term 1)
+          (op-smin
+           (fn 'y
+             (??term 2))
+           'ws-2)))
 
 (define (interpret p env)
   (destruct p
@@ -119,12 +134,21 @@
          [result (cdr result)]
          [else (cdr (assoc p fvs))])]))
 
-(define sketch
-  (op-min (op-weight 'E 'x 'z 'ws-1)
-          (op-smin
-           (fn 'y
-             (op-plus (rel-S 'R 'x 'y 'ws-2)
-                      (op-weight 'E 'y 'z 'ws-2)))
-           'ws-2)))
+;; (define sketch
+;;   (op-min (op-weight 'E 'x 'z 'ws-1)
+;;           (op-smin
+;;            (fn 'y
+;;              (op-plus (rel-S 'R 'x 'y 'ws-2)
+;;                       (op-weight 'E 'y 'z 'ws-2)))
+;;            'ws-2)))
 
-(verify (assert (= (interpret sketch '()) (rule-S R E x z ws-1 ws-2))))
+;; (verify (assert (= (interpret sketch '()) (rule-S R E x z ws-1 ws-2))))
+
+;; (define sketch (??term 4))
+
+(define M
+  (synthesize
+   #:forall (list R E x z)
+   #:guarantee (assert (= (interpret sketch '()) (rule-S R E x z ws-1 ws-2)))))
+
+(evaluate sketch M)

@@ -100,10 +100,7 @@
 
 (define sketch
   ((??op) (??term 1)
-          (op-smin
-           (fn 'y
-             (??term 2))
-           'ws-2)))
+          (op-smin (fn 'y (??term 2)) 'ws-2)))
 
 (define (interpret p env)
   (destruct p
@@ -133,18 +130,6 @@
        (cond
          [result (cdr result)]
          [else (cdr (assoc p fvs))])]))
-
-;; (define sketch
-;;   (op-min (op-weight 'E 'x 'z 'ws-1)
-;;           (op-smin
-;;            (fn 'y
-;;              (op-plus (rel-S 'R 'x 'y 'ws-2)
-;;                       (op-weight 'E 'y 'z 'ws-2)))
-;;            'ws-2)))
-
-;; (verify (assert (= (interpret sketch '()) (rule-S R E x z ws-1 ws-2))))
-
-;; (define sketch (??term 4))
 
 (define M
   (synthesize

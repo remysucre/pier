@@ -51,7 +51,7 @@
 
 (define (S-R-code x z)
   (op-sum 'w
-          (op-t* (rel-R x z 'w) 'w)))
+          (op-t* (R-code x z 'w) 'w)))
 
 (define (S-code x z)
   (op-sum 'w

@@ -42,9 +42,23 @@
 
 (define (R-code x z w)
   (op-t+ (op-I (rel-E x z w))
-      (op-sum-int 'y
-           (op-sum 'w1
-                (op-sum 'w2
-                     (op-t* (op-I (rel-R x 'y 'w1))
-                         (op-t* (op-I (rel-E 'y x 'w2))
-                             (op-I (op-eq? w (op-t* 'w1 'w2))))))))))
+         (op-sum-int 'y
+                     (op-sum 'w1
+                             (op-sum 'w2
+                                     (op-t* (op-I (rel-R x 'y 'w1))
+                                            (op-t* (op-I (rel-E 'y x 'w2))
+                                                   (op-I (op-eq? w (op-t* 'w1 'w2))))))))))
+
+(define (S-R-code x z)
+  (op-sum 'w
+          (op-t* (rel-R x z 'w) 'w)))
+
+(define (S-code x z)
+  (op-sum 'w
+          (op-t* (op-I (rel-R x z 'w)) 'w)))
+
+(define (S-opt-code x z)
+  (op-t+ (op-weight x z)
+         (op-sum 'y
+                 (op-t* (S-code x 'y)
+                        (op-weight y z)))))

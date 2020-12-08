@@ -62,8 +62,8 @@
 
 (define (??term depth)
   (if (= depth 1)
-      (choose* (rel-S 'R (??var) (??var) (??ws))
-               (op-weight 'E (??var) (??var) (??ws)))
+      (choose* #;(rel-S 'R 'x 'y 'ws-1)
+               (op-weight 'E 'x 'y 'ws-1))
       (choose* ((??op) (??term (- depth 1))
                        (??term (- depth 1)))
                (op-smin (fn (??var) (??term (- depth 1))) (??ws)))))
@@ -131,9 +131,17 @@
          [result (cdr result)]
          [else (cdr (assoc p fvs))])]))
 
-(define M
-  (synthesize
-   #:forall (list R E x z)
-   #:guarantee (assert (= (interpret sketch '()) (rule-S R E x z ws-1 ws-2)))))
+;; (define M
+;;   (synthesize
+;;    #:forall (list R E x z)
+;;    #:guarantee (assert (= (interpret sketch '()) (rule-S R E x z ws-1 ws-2)))))
 
-(evaluate sketch M)
+;; (evaluate sketch M)
+
+;; (define (??term depth)
+;;   (if (= depth 1)
+;;       (choose* (rel-S 'R (??var) (??var) (??ws))
+;;                (op-weight 'E (??var) (??var) (??ws)))
+;;       (choose* ((??op) (??term (- depth 1))
+;;                        (??term (- depth 1)))
+;;                (op-smin (fn (??var) (??term (- depth 1))) (??ws)))))

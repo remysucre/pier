@@ -4,6 +4,7 @@
          rosette/lib/synthax    ; provides `??`
          rosette/lib/destruct)  ; provipes `destruct`
 
+;; TODO use union instead?
 ;; tropical number; infty if i
 (struct trop (i n) #:transparent)
 
@@ -87,6 +88,7 @@
                 (trop #f (+ m n)))]))]))
 
 ;; TODO try real for x y
+;; FIXME same problem as sig for (boolean? real?)
 (define-symbolic E-i-n (~> integer? integer? boolean? real? boolean?))
 (define (E x y w)
   (destruct w

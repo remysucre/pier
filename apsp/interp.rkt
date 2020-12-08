@@ -46,7 +46,7 @@
     [(op-I e) (fvs e)]
     [(rel-E x y w) (append (fvs x) (fvs y) (fvs w))]
     [(rel-R x y w) (append (fvs x) (fvs y) (fvs w))]
-    [_ (if (var? p) (list p) '())]))
+    [_ (if (assoc p vars) (list p) '())]))
 
 (assert (eq? (fvs 'x) '(x)))
 (assert (eq? (fvs (rel-E 'x 'y 'w)) '(x y w)))

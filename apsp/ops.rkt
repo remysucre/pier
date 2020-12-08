@@ -15,6 +15,20 @@
 ;; #t => 0, #f => infty
 (define (I b) (if b 0 #t))
 
+(define (t+ a b)
+  (if (boolean? a)
+      b
+      (if (boolean? b)
+          a
+          (min a b))))
+
+(define (t* a b)
+  (if (boolean? a)
+      #t
+      (if (boolean? b)
+          #t
+          (+ a b))))
+
 ;; uninterpreted tropical summation
 
 (define-symbolic sig-ii-n real?)
@@ -61,17 +75,3 @@
   (if (boolean? e)
       (sig-int-i v)
       (sig-int-n v e)))
-
-(define (t+ a b)
-  (if (boolean? a)
-      b
-      (if (boolean? b)
-          a
-          (min a b))))
-
-(define (t* a b)
-  (if (boolean? a)
-      #t
-      (if (boolean? b)
-          #t
-          (+ a b))))

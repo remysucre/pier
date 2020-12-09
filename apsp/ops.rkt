@@ -48,7 +48,7 @@
 (define-symbolic sig-nn-n (~> real? real? real?))
 (define-symbolic sig-nn-b (~> real? real? boolean?))
 (define (sig-nn x y)
-  (if (sig-nn-b x y) #t (sig-nn-n x)))
+  (if (sig-nn-b x y) #t (sig-nn-n x y)))
 
 (define (sig v e)
   (if (boolean? v)

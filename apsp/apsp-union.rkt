@@ -8,12 +8,13 @@
          "defs.rkt"
          "interp.rkt")
 
-;; MIN_{y,w1,w2,w} w * R(x,y,w1) * E(y,x,w2) * 1_{w=w1*w2}
+;; (29) ... + MIN_{y,w1,w2,w} w * R(x,y,w1) * E(y,x,w2) * 1_{w=w1*w2}
 (define l
   (interpret
    (push-sum
     (simplify
      (push-sum
+      (op-t+ (op-weight 'w 'x 'z)
       (op-sum-int
        'y
        (op-sum
@@ -25,22 +26,20 @@
           (op-t* 'w
                  (op-t* (op-I (rel-R 'x 'y 'w1))
                         (op-t* (op-I (rel-E 'y 'x 'w2))
-                               (op-I (op-eq? 'w (op-t* 'w1 'w2)))))))))))))))
+                               (op-I (op-eq? 'w (op-t* 'w1 'w2))))))))))))))))
 
-;; MIN_{y,w1,w2} R(x,y,w1) * E(y,x,w2) * w1 * w2
+;; (31) ... + MIN_{y,w1,w2} R(x,y,w1) * E(y,x,w2) * w1 * w2
 (define r
   (interpret
    (push-sum
-    (simplify
-     (push-sum
+    (op-t+ (op-weight 'w 'x 'z)
       (op-sum-int
        'y
        (op-sum
-        'w1
+        'w2
         (op-sum
-         'w2
-         (op-t* (op-I (rel-R 'x 'y 'w1))
-                (op-t* (op-I (rel-E 'y 'x 'w2))
-                       (op-t* 'w1 'w2)))))))))))
+         'w1
+         (op-t* (op-t* (op-I (rel-R 'x 'y 'w1)) 'w1)
+                (op-t* (op-I (rel-E 'y 'x 'w2)) 'w2)))))))))
 
 (verify (assert (eq? l r)))

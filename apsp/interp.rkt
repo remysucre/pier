@@ -23,8 +23,9 @@
     [(op-sum-int v e)
      (sig-int (interpret v)
               (interpret e))]
-    [(op-weight x y)
-     (weight (interpret x)
+    [(op-weight w x y)
+     (weight (interpret w)
+             (interpret x)
              (interpret y))]
     [(op-I e)
      (I (interpret e))]
@@ -42,7 +43,7 @@
     [(op-eq? x y) (append (fvs x) (fvs y))]
     [(op-sum v e) (remove* (fvs v) (fvs e))]
     [(op-sum-int v e) (remove* (fvs v) (fvs e))]
-    [(op-weight x y) (list x y)]
+    [(op-weight w x y) (list x y)]
     [(op-I e) (fvs e)]
     [(rel-E x y w) (append (fvs x) (fvs y) (fvs w))]
     [(rel-R x y w) (append (fvs x) (fvs y) (fvs w))]

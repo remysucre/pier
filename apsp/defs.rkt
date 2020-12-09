@@ -19,10 +19,7 @@
 (define (E x y w) (if (boolean? w) (E-i-n x y) (E-n-n x y w)))
 
 ;; NOTE check symbolic def
-(define (weight x z)
-  (define (w-b) (define-symbolic* b boolean?) b)
-  (define (w-n) (define-symbolic* x real?) x)
-  (define w (if (w-b) #t (w-n)))
+(define (weight w x z)
   (sig w (t* w (I (E x z w)))))
 
 (define-symbolic x y z integer?)
@@ -58,7 +55,7 @@
           (op-t* (op-I (rel-R x z 'w)) 'w)))
 
 (define (S-opt-code x z)
-  (op-t+ (op-weight x z)
+  (op-t+ (op-weight 'w x z)
          (op-sum 'y
                  (op-t* (S-code x 'y)
-                        (op-weight y z)))))
+                        (op-weight 'w2 y z)))))

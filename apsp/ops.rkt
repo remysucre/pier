@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(struct op-weight (x y) #:transparent)
+(struct op-weight (w x y) #:transparent)
 (struct op-sum (v e) #:transparent)
 (struct op-sum-int (v e) #:transparent)
 (struct op-t+ (x y) #:transparent)

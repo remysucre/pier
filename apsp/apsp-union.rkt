@@ -12,18 +12,17 @@
 (define (??w) (choose* 'w 'w1 'w2))
 (define (??op) (choose* op-t+ op-t*))
 
+;; FIXME still getting weird error if the order of first
+;; choice is swapped
 (define (??term depth)
   (if (= 0 depth)
-      (choose* #;(op-I (rel-R (??v) (??v) (??w)))
+      (choose* (??w)
                (op-I (rel-E (??v) (??v) (??w)))
-               (??w)
                (op-weight (??w) (??v) (??v)))
       (choose* ((??op) (??term (- depth 1)) (??term (- depth 1)))
-               (op-I (??term (- depth 1)))
-               (op-sum (??w)
-                       (??term (- depth 1)))
-               (op-sum-int (??v)
-                       (??term (- depth 1))))))
+               (op-I (??term (- depth 1))) ;; FIXME probably because of this
+               (op-sum (??w) (??term (- depth 1)))
+               (op-sum-int (??v) (??term (- depth 1))))))
 
 (define S-29
   (op-t+ (op-weight 'w 'x 'z)

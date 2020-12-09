@@ -12,50 +12,56 @@
 (struct rel-E (x y w) #:transparent)
 (struct rel-R (x y w) #:transparent)
 
-;; #t => 0, #f => infty
-(define (I b) (if b 0 #t))
+;; a tropical number is either a real or #f (for inf)
+(define inf #f)
+(define inf? boolean?)
 
+;; #t => 0, #f => infty
+(define (I b) (if b 0 inf))
+
+;; tropical plus = min
 (define (t+ a b)
-  (if (boolean? a)
+  (if (inf? a)
       b
-      (if (boolean? b)
+      (if (inf? b)
           a
           (min a b))))
 
+;; tropical times = +
 (define (t* a b)
-  (if (boolean? a)
-      #t
-      (if (boolean? b)
-          #t
+  (if (inf? a)
+      inf
+      (if (inf? b)
+          inf
           (+ a b))))
 
 ;; uninterpreted tropical summation
 
 (define-symbolic sig-ii-n real?)
 (define-symbolic sig-ii-b boolean?)
-(define sig-ii (if sig-ii-b #t sig-ii-n))
+(define sig-ii (if sig-ii-b inf sig-ii-n))
 
 (define-symbolic sig-in-n (~> real? real?))
 (define-symbolic sig-in-b (~> real? boolean?))
 (define (sig-in x)
-  (if (sig-in-b x) #t (sig-in-n x)))
+  (if (sig-in-b x) inf (sig-in-n x)))
 
 (define-symbolic sig-ni-n (~> real? real?))
 (define-symbolic sig-ni-b (~> real? boolean?))
 (define (sig-ni x)
-  (if (sig-ni-b x) #t (sig-ni-n x)))
+  (if (sig-ni-b x) inf (sig-ni-n x)))
 
 (define-symbolic sig-nn-n (~> real? real? real?))
 (define-symbolic sig-nn-b (~> real? real? boolean?))
 (define (sig-nn x y)
-  (if (sig-nn-b x y) #t (sig-nn-n x y)))
+  (if (sig-nn-b x y) inf (sig-nn-n x y)))
 
 (define (sig v e)
-  (if (boolean? v)
-      (if (boolean? e)
+  (if (inf? v)
+      (if (inf? e)
           sig-ii
           (sig-in e))
-      (if (boolean? e)
+      (if (inf? e)
           (sig-ni v)
           (sig-nn v e))))
 
@@ -64,14 +70,14 @@
 (define-symbolic sig-int-i-b (~> integer? boolean?))
 (define-symbolic sig-int-i-n (~> integer? real?))
 (define (sig-int-i v)
-  (if (sig-int-i-b v) #t (sig-int-i-n v)))
+  (if (sig-int-i-b v) inf (sig-int-i-n v)))
 
 (define-symbolic sig-int-n-b (~> integer? real? boolean?))
 (define-symbolic sig-int-n-n (~> integer? real? real?))
 (define (sig-int-n v e)
-  (if (sig-int-n-b v e) #t (sig-int-n-n v e)))
+  (if (sig-int-n-b v e) inf (sig-int-n-n v e)))
 
 (define (sig-int v e)
-  (if (boolean? e)
+  (if (inf? e)
       (sig-int-i v)
       (sig-int-n v e)))

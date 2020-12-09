@@ -50,7 +50,11 @@
 
 (define M
   (synthesize
-   #:forall (list R-i-n R-n-n E-i-n E-n-n x y z w-i w1-i w2-i w-n w1-n w2-n sig-ii-n sig-ii-b sig-in-n sig-in-b sig-ni-n sig-ni-b sig-nn-n sig-nn-b sig-int-i-b sig-int-i-n sig-int-n-b sig-int-n-n)
+   #:forall (list R-i-n R-n-n E-i-n E-n-n
+                  x y z
+                  w-i w1-i w2-i w-n w1-n w2-n
+                  sig-ii-n sig-ii-b sig-in-n sig-in-b sig-ni-n sig-ni-b sig-nn-n sig-nn-b
+                  sig-int-i-b sig-int-i-n sig-int-n-b sig-int-n-n)
    #:guarantee (assert (eq? (interpret sketch) (interpret S-29)))))
 
 (evaluate sketch M)

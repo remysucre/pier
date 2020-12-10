@@ -37,6 +37,11 @@
                                             (op-t* (op-I (rel-E 'y 'x 'w2))
                                                    (op-t* 'w1 'w2))))))))
 
+;; ??term +
+;; MIN_{?v ...}
+;;   MIN_w1
+;;     MIN_{?u ...} R(x, y, w1) * w1
+;;                  * ??term
 (define sketch
   (op-t+ (??term 0)
          (??agg 1

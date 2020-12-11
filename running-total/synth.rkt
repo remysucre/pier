@@ -30,21 +30,16 @@
                                   (op-* (op-I (op-eq? 't 'j)) 'w))))
         (op-sum-int 'j
                     (op-sum 'w
-                            (op-*
-                             (op-* 'w (op-I (rel-R (op-- 't 1) 'j 'w)))
-                             (op-* (op-I (op-leq 1 'j))
-                                   (op-* (op-I (op-leq 'j (op-- 't 1)))
-                                         (op-I (op-leq 1 (op-- 't 1))))))))))
-
-(verify (assert (eq? (interpret S-29)
-                     (interpret (op-+ (rel-S (op-- 't 1))
-                                      (op-vec-get 'j 'w 't))))))
+                            (op-* (op-* 'w (op-I (rel-R (op-- 't 1) 'j 'w)))
+                                  (op-* (op-I (op-leq 1 'j))
+                                        (op-* (op-I (op-leq 'j (op-- 't 1)))
+                                              (op-I (op-leq 1 (op-- 't 1))))))))))
 
 ;; ??term +
 ;; MIN_{?v ...}
 ;;   MIN_w1
 ;;     MIN_{?u ...} R(x, y, w1) * w1
-                 * ??term
+;;                 * ??term
 (define sketch
   ((??op) (??term 0)
           (rel-S (op-- 't 1))))

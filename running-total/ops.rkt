@@ -17,8 +17,5 @@
 
 (define (I b) (if b 1 0))
 
-;; (define-symbolic sig (~> real? real? real?))
-;; (define-symbolic sig-int (~> integer? real? real?))
-
 (define-symbolic sig (~> integer? integer? integer?))
 (define-symbolic sig-int (~> integer? integer? integer?))

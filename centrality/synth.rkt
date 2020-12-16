@@ -9,21 +9,11 @@
          "interp.rkt")
 
 (define S-237
-  (op-+ (op-sum 't (op-* (op-I (rel-E 'v 't))
-                         (op-delta 's 'v 't)))
+  (op-+ (op-sum 't (op-delta 's 'v 't))
         (op-sum 'u
                 (op-sum 't
-                        (op-/ (op-* (op-/ (rel-sigma 's 't) (rel-sigma 's 't))(op-* (op-* (op-I (rel-E 'v 't))
-                                          (op-* (op-I (op-eq? (rel-D 's 'u)
-                                                              (op-+ (rel-D 's 't)
-                                                                    (rel-D 't 'u))))
-                                                (op-I (op-eq? (rel-D 's 't)
-                                                              (op-+ (rel-D 's 'v)
-                                                                    (rel-D 'v 't))))))
-                                    (op-* (rel-sigma 's 'v)
-                                          (op-* (rel-sigma 'v 't)
-                                                (rel-sigma 't 'u)))))
-                              (rel-sigma 's 'u))))))
+                        (op-* (op-delta 's 'v 't)
+                              (op-delta 's 't 'u))))))
 
 (define S-238
   (op-+ (op-sum 't (op-* (op-I (rel-E 'v 't))

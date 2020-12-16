@@ -60,13 +60,14 @@
   (if (= 0 depth)
       (choose* (??v)
                (op-I (rel-E (??v) (??v)))
-               (op-delta (??v) (??v) (??v)))
+               (op-delta (??v) (??v) (??v))
+               (op-sum 't
+                (op-* (op-I (rel-E 'v 't))
+                      (op-delta 's 'v 't))))
       ((??op) (??term (- depth 1)) (??term (- depth 1)))))
 
 (define sketch
-  (op-+ (op-sum 't
-                (op-* (op-I (rel-E 'v 't))
-                      (op-delta 's 'v 't)))
+  (op-+ (??term 0)
         (op-sum (??v)
                 (op-sum 't
                         (op-* (op-delta 's 'v 't)

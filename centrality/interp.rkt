@@ -20,8 +20,8 @@
     [(op-inv x)
      (inv (interpret x))]
     [(op-/ x y)
-     (diiv (interpret x)
-           (interpret y))]
+     (* (interpret x)
+        (interpret (op-inv (interpret y))))]
     [(op-sum v e)
      (sig (interpret v)
           (interpret e))]

@@ -25,7 +25,6 @@
 (define-symbolic s t u v integer?)
 
 (define-symbolic sig (~> integer? integer? integer?))
-(define-symbolic diiv (~> integer? integer? integer?))
 (define-symbolic inv (~> integer? integer?))
 
 (define (I b) (if b 1 0))

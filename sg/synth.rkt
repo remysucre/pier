@@ -28,21 +28,25 @@
 ;;
 
 (define S-1
-  (op-+ (op-= 1 'y)
+  (op-+ (op-exists 'x (op-* (op-= 'x 1) (op-= 'x 'y)))
+        (op-exists 'x
         (op-exists 'p
                    (op-exists 'q
-                              (op-* (rel-R 'p 'q)
-                                    (op-* (rel-E 1 'p)
-                                          (rel-E 'y 'q)))))))
+                              (op-* (op-* (rel-R 'p 'q)
+                                          (op-= 'x 1))
+                                    (op-* (rel-E 'x 'p)
+                                          (rel-E 'y 'q))))))))
 
 (define S-M
-  (op-+ (op-* (op-= 1 'y) (rel-T 1))
-        (op-exists 'p
+  (op-+ (op-exists 'x (op-* (op-= 'x 1)
+              (op-* (op-= 'x 'y) (rel-T 'x))))
+        (op-exists 'x (op-exists 'p
                    (op-exists 'q
-                              (op-* (rel-T 1)
+                              (op-* (op-* (rel-T 'x)
+                                          (op-= 'x 1))
                                     (op-* (rel-R 'p 'q)
-                                          (op-* (rel-E 1 'p)
-                                                (rel-E 'y 'q))))))))
+                                          (op-* (rel-E 'x 'p)
+                                                (rel-E 'y 'q)))))))))
 
 (define-symbolic v u integer?)
 (assert (T 1))

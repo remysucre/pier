@@ -29,7 +29,7 @@
                                                               (op-+ (rel-D 's 'v)
                                                                     (rel-D 'v 'u))))
                                                 (op-I (op-eq? (rel-D 'v 'u)
-                                                              (op-+ (rel-D 'v 't)
+                                                              (op-+ 1
                                                                     (rel-D 't 'u))))))
                                     (op-* (rel-sigma 's 'v)
                                           (op-* (rel-sigma 'v 't)
@@ -40,6 +40,7 @@
 (assert (forall (list x y z) (<= (D x z) (+ (D x y) (D y z)))))
 (assert (= (* (inv (sigma s u)) (sigma s u)) 1))
 (assert (= (* (inv (sigma s t)) (sigma s t)) 1))
+(assert (forall (list x y) (<=> (E x y) (= 1 (D x y)))))
 
 ;; NOTE the following is unsat
 ;; (assert (forall (list x) (=> (> x 0) (= (* x (inv x)) 1))))

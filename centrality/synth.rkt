@@ -31,9 +31,7 @@
                                                 (op-I (op-eq? (rel-D 'v 'u)
                                                               (op-+ 1
                                                                     (rel-D 't 'u))))))
-                                    (op-* (rel-sigma 's 'v)
-                                          (op-* (rel-sigma 'v 't)
-                                                (rel-sigma 't 'u))))
+                                    (op-* (rel-sigma 's 'v) (rel-sigma 't 'u)))
                               (rel-sigma 's 'u))))))
 
 (define-symbolic x y z integer?)
@@ -41,6 +39,7 @@
 (assert (= (* (inv (sigma s u)) (sigma s u)) 1))
 (assert (= (* (inv (sigma s t)) (sigma s t)) 1))
 (assert (forall (list x y) (<=> (E x y) (= 1 (D x y)))))
+(assert (forall (list x y) (<=> (E x y) (= 1 (sigma x y)))))
 
 ;; NOTE the following is unsat
 ;; (assert (forall (list x) (=> (> x 0) (= (* x (inv x)) 1))))
@@ -51,7 +50,7 @@
 ;; (assert (<= (D s u) (+ (D s v) (D v u))))
 ;; (assert (<= (D v u) (+ (D v t) (D t u))))
 
-;; (verify (assert (not (= (interpret S-237) (interpret S-238)))))
+(verify (assert (not (= (interpret S-237) (interpret S-238)))))
 (verify (assert (= (interpret S-237) (interpret S-238))))
 
 (define (??v) (choose* 's 'u 'v 't))

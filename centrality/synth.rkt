@@ -50,10 +50,6 @@
 ;; (assert (<= (D s u) (+ (D s v) (D v u))))
 ;; (assert (<= (D v u) (+ (D v t) (D t u))))
 
-(require rosette/solver/smt/cvc4)
-(cvc4-available?)
-(current-solver (cvc4))
-
 (verify (assert (not (= (interpret S-237) (interpret S-238)))))
 (verify (assert (= (interpret S-237) (interpret S-238))))
 
@@ -77,9 +73,9 @@
                         (op-* (op-delta 's 'v 't)
                               (??term 1))))))
 
-;; (define M
-;;   (synthesize
-;;    #:forall (list E sigma D s t u v sig inv)
-;;    #:guarantee (assert (eq? (interpret sketch) (interpret S-238)))))
+(define M
+  (synthesize
+   #:forall (list E sigma D s t u v sig inv)
+   #:guarantee (assert (eq? (interpret sketch) (interpret S-238)))))
 
-;; (evaluate sketch M)
+(evaluate sketch M)

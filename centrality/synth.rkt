@@ -20,8 +20,8 @@
 
 (define S-238
   (op-+ (op-sum 't (op-* (op-I (rel-E 'v 't))
-                         (op-* (op-sigma 's 'v 't)
-                               (op-inv (rel-sigma 's 't)))))
+                         (op-/ (op-sigma 's 'v 't)
+                               (rel-sigma 's 't))))
         (op-sum 'u
                 (op-sum 't
                         (op-/ (op-* (op-* (op-I (rel-E 'v 't))
@@ -40,9 +40,6 @@
 (assert (= (* (inv (sigma s t)) (sigma s t)) 1))
 (assert (forall (list x y) (<=> (E x y) (= 1 (D x y)))))
 (assert (forall (list x y) (<=> (E x y) (= 1 (sigma x y)))))
-
-;; NOTE the following is unsat
-;; (assert (forall (list x) (=> (> x 0) (= (* x (inv x)) 1))))
 
 ;; NOTE try the following when z3 returns unknown
 ;; (assert (<= (D s u) (+ (D s t) (D t u))))

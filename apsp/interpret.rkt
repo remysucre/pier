@@ -57,7 +57,17 @@
     [(op-exists v e)
      (exist (interpret v)
             (interpret e))]
-    [p (udf p)]))
+    ;; PER PROGRAM DEFS
+    [(op-weight w x y)
+     (interpret (weight (interpret w)
+                        (interpret x)
+                        (interpret y)))]
+    [(rel-E x y w)
+     (E (interpret x) (interpret y) (interpret w))]
+    [(rel-R x y w)
+     (R (interpret x) (interpret y) (interpret w))]
+    [_ (define result (assoc p vars))
+       (if result (cdr result) p)]))
 
 ;; PER PROGRAM DEFINITIONS
 
@@ -100,15 +110,3 @@
         (cons 'w1 w1)
         (cons 'w2 w2)))
 
-(define (udf p)
-  (destruct p
-    [(op-weight w x y)
-     (interpret (weight (interpret w)
-                        (interpret x)
-                        (interpret y)))]
-    [(rel-E x y w)
-     (E (interpret x) (interpret y) (interpret w))]
-    [(rel-R x y w)
-     (R (interpret x) (interpret y) (interpret w))]
-    [_ (define result (assoc p vars))
-       (if result (cdr result) p)]))

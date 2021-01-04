@@ -61,9 +61,13 @@
 
 ;; PER PROGRAM DEFINITIONS
 
+;; STRUCTS
+
 (struct op-weight (w x y) #:transparent)
 (struct rel-E (w x y) #:transparent)
 (struct rel-R (w x y) #:transparent)
+
+;; RELATIONS
 
 (define-symbolic E-i-n (~> integer? integer? boolean?))
 (define-symbolic E-n-n (~> integer? integer? real? boolean?))
@@ -73,9 +77,13 @@
 (define-symbolic R-n-n (~> integer? integer? real? boolean?))
 (define (R x y w) (if (inf? w) (R-i-n x y) (R-n-n x y w)))
 
+;; UDFs
+
 (define (weight w x z)
   (op-sum-t-t w
               (op-t* w (op-I-BT (rel-E x z w)))))
+
+;; VARIABLES
 
 (define-symbolic x y z integer?)
 (define-symbolic w-i w1-i w2-i boolean?)

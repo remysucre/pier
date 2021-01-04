@@ -57,54 +57,6 @@
     [(op-exists v e)
      (exist (interpret v)
             (interpret e))]
-    ;; [(op-* x y)
-    ;;  (* (interpret x)
-    ;;     (interpret y))]
-    ;; [(op-+ x y)
-    ;;  (+ (interpret x)
-    ;;     (interpret y))]
-    ;; [(op-inv x)
-    ;;  (inv (interpret x))]
-    ;; [(op-/ x y)
-    ;;  (* (interpret x)
-    ;;     (interpret (op-inv (interpret y))))]
-    ;; [(op-I-BT e)
-    ;;  (I-BT (interpret e))]
-    ;; [(op-&& x y)
-    ;;  (&& (interpret x)
-    ;;      (interpret y))]
-    ;; [(op-|| x y)
-    ;;  (|| (interpret x)
-    ;;      (interpret y))]
-    ;; [(op-- x y)
-    ;;  (- (interpret x)
-    ;;     (interpret y))]
-    ;; [(op-leq x y)
-    ;;  (<= (interpret x)
-    ;;      (interpret y))]
-    ;; [(op-sum-i-i v e)
-    ;;  (sum-i-i (interpret v)
-    ;;           (interpret e))]
-    ;; [(op-eq? x y)
-    ;;  (eq? (interpret x)
-    ;;       (interpret y))]
-    ;; [(op-I-BN e)
-    ;;  (I-BN (interpret e))]
-    ;; [(op-t* x y)
-    ;;  (t* (interpret x )
-    ;;      (interpret y))]
-    ;; [(op-t+ x y)
-    ;;  (t+ (interpret x)
-    ;;      (interpret y))]
-    ;; [(op-sum-i-t v e)
-    ;;  (sum-i-t (interpret v)
-    ;;           (interpret e))]
-    ;; [(op-sum-t-t v e)
-    ;;  (sum-t-t (interpret v)
-    ;;           (interpret e))]
-    ;; [(op-exists v e)
-    ;;  (exist (interpret v)
-    ;;         (interpret e))]
     ;; RELATIONS
     [(rel-D x y)
      (D (interpret x) (interpret y))]
@@ -163,3 +115,11 @@
 
 (define (delta s v t)
   (op-* (op-sigma s v t) (op-inv (rel-sigma s t))))
+
+;; ASSERTS
+(define-symbolic x y z integer?)
+(assert (forall (list x y z) (<= (D x z) (+ (D x y) (D y z)))))
+(assert (= (* (inv (sigma s u)) (sigma s u)) 1))
+(assert (= (* (inv (sigma s t)) (sigma s t)) 1))
+(assert (forall (list x y) (<=> (E x y) (= 1 (D x y)))))
+(assert (forall (list x y) (<=> (E x y) (= 1 (sigma x y)))))

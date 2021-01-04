@@ -33,17 +33,6 @@
                               (op-* (op-delta 's 'v 't)
                                     (op-delta 's 't 'u)))))))
 
-;; ASSERTS
-(define-symbolic x y z integer?)
-(assert (forall (list x y z) (<= (D x z) (+ (D x y) (D y z)))))
-(assert (= (* (inv (sigma s u)) (sigma s u)) 1))
-(assert (= (* (inv (sigma s t)) (sigma s t)) 1))
-(assert (forall (list x y) (<=> (E x y) (= 1 (D x y)))))
-(assert (forall (list x y) (<=> (E x y) (= 1 (sigma x y)))))
-
-;; (verify (assert (not (= (interpret S-237) (interpret prog)))))
-;; (verify (assert (= (interpret S-237) (interpret prog))))
-
 ;; GRAMMAR
 
 (define (??v) (choose* 's 'u 'v 't))

@@ -1,7 +1,7 @@
 #lang rosette/safe
 
 (require rosette/lib/destruct)
-(require "ops.rkt")
+(require "../ops.rkt")
 
 (provide (all-defined-out))
 

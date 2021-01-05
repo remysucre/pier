@@ -6,6 +6,7 @@
 (require "../ops.rkt"
          "interpret.rkt")
 
+;; INPUT
 (define (prefix t)
   (op-+ (op-sum-i-i 'j
                     (op-sum-i-i 'w
@@ -19,6 +20,8 @@
                                   (op-* (op-I-BN (op-leq 1 'j))
                                         (op-* (op-I-BN (op-leq 'j (op-- t 1)))
                                               (op-I-BN (op-leq 1 (op-- t 1))))))))))
+
+;; GRAMMAR
 
 (define (??v) (choose* 'j 't 'k))
 (define (??w) (choose* 'w))

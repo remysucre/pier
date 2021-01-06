@@ -12,11 +12,9 @@
   (op-t+ (op-weight 'w 'x 'z)
          (op-sum-i-t 'y
                      (op-sum-t-t 'w1
-                             (op-sum-t-t 'w2
-                                     (op-t* (op-I-BT (rel-R 'x 'y 'w1))
-                                            (op-t* (op-I-BT (rel-E 'y 'x 'w2))
-                                                   (op-t* 'w1 'w2))))))))
-
+                                 (op-t* (op-I-BT (rel-R 'x 'y 'w1))
+                                        (op-t* (op-weight 'w2 'y 'z)
+                                               'w1))))))
 ;; GRAMMAR
 
 (define (??v) (choose* 'x 'y 'z))
@@ -43,9 +41,9 @@
   (op-t+ (??term 0)
          (??agg 1
                 (op-sum-t-t 'w1
-                        (??agg 1
+                        (??agg 0
                         (op-t* (op-t* (op-I-BT (rel-R 'x 'y 'w1)) 'w1)
-                               (??term 1)))))))
+                               (??term 0)))))))
 
 (define M
   (synthesize

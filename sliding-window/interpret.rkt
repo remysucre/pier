@@ -34,6 +34,12 @@
         (interpret (op-inv (interpret y))))]
     [(op-inv x)
      (inv (interpret x))]
+    [(op-lt x y)
+     (< (interpret x)
+        (interpret y))]
+    [(op-gt x y)
+     (> (interpret x)
+        (interpret y))]
     [(op-leq x y)
      (<= (interpret x)
          (interpret y))]
@@ -77,6 +83,8 @@
        (if result (cdr result) p)]
     ))
 
+(struct op-lt (x y) #:transparent)
+(struct op-gt (x y) #:transparent)
 
 (struct op-vec-get (j w t) #:transparent)
 (struct rel-v (i v) #:transparent)

@@ -6,6 +6,27 @@
 (require "../ops.rkt"
          "interpret.rkt")
 
+;; (define prog
+;; (op-+
+;;  (op-sum-i-i
+;;   't
+;;   (op-*
+;;    (op-I-BN (op-eq? (rel-D 's 't) (op-+ (rel-D 's 'v) (rel-D 'v 't))))
+;;    (op-* (op-inv (rel-sigma 's 't)) (op-* (rel-sigma 's 'v) (op-I-BN (rel-E 'v 't))))))
+;;  (op-sum-i-i
+;;   'u
+;;   (op-sum-i-i
+;;    't
+;;    (op-*
+;;     (op-I-BN (op-eq? (rel-D 's 'u) (op-+ (rel-D 's 'v) (rel-D 'v 'u))))
+;;     (op-*
+;;      (op-inv (rel-sigma 's 'u))
+;;      (op-*
+;;       (rel-sigma 's 'v)
+;;       (op-*
+;;        (op-* (rel-sigma 't 'u) (op-I-BN (rel-E 'v 't)))
+;;        (op-I-BN (op-eq? (rel-D 'v 'u) (op-+ 1 (rel-D 't 'u))))))))))))
+
 ;; INPUT
 (define prog
   (op-+ (op-sum-i-i 't (op-* (op-I-BN (rel-E 'v 't))

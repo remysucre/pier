@@ -9,11 +9,9 @@
 ;; INPUT
 
 (define prog
-  (op-t+ (op-weight 'w 'x 'z)
-         (op-sum-i-t 'y
-                     (op-sum-t-t 'w1
-                                 (op-t* (op-weight 'w2 'y 'z)
-                                        (op-t* 'w1 (op-I-BT (rel-R 'x 'y 'w1))))))))
+(op-t+
+ (op-weight 'w 'x 'z)
+ (op-sum-i-t 'y (op-sum-t-t 'w1 (op-t* (op-weight 'w2 'y 'z) (op-t* 'w1 (op-I-BT (rel-R 'x 'y 'w1))))))))
 
 ;; GRAMMAR
 

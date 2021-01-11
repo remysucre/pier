@@ -32,12 +32,8 @@
 
 (process '(+
   (weight (var w) (var x) (var z))
-  (sum
-    y
-    (sum
-      w1
-      (*
-        (weight (var w2) (var y) (var z))
-        (*
-          (var w1)
+  (sum y
+    (sum w1
+      (* (weight (var w2) (var y) (var z))
+        (* (var w1)
           (I (rel R (var x) (var y) (var w1)))))))))

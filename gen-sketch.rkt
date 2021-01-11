@@ -6,8 +6,14 @@
 (require "ops.rkt"
          "apsp/interpret.rkt")
 
+;; HACK hard-coding vars and weights
 (define (var? p)
   (member p (list 'x 'y 'z)))
+
+(define (weight? p)
+  (member p (list 'w 'w1 'w2)))
+
+;; Generate vars and weights
 
 (define (gen-v-dup p)
   (match p
@@ -18,9 +24,6 @@
 (define (gen-v p)
   (remove-duplicates (gen-v-dup p)))
 
-(define (weight? p)
-  (member p (list 'w 'w1 'w2)))
-
 (define (gen-w-dup p)
   (match p
     [`(,op ,args ...) (apply append (map gen-w args))]
@@ -30,8 +33,9 @@
 (define (gen-w p)
   (remove-duplicates (gen-w-dup p)))
 
-
+;; Generate terminals (relations and UDFs)
 ;; TODO should take in a list of decls
+
 (define (gen-rel ds p)
   (define (??v) (apply choose* (gen-v p)))
   (define (??w) (apply choose* (gen-w p)))
@@ -49,7 +53,9 @@
          (append (gen-rel ds p)
                  (gen-rel-udf ds p)))))
 
+;; Generate non-terminals (operators, sums)
 ;; TODO find what sums are used
+
 (define (gen-nonterm ds p)
   (define (??op) (choose* op-t+ op-t*))
   (define (??v) (apply choose* (gen-v p)))
@@ -62,7 +68,9 @@
              (op-sum-i-t (??v) (??term (- depth 1))))))
   ??term)
 
+;; Additional layers of sums
 ;; TODO find what sums are used
+
 (define (gen-agg p)
   (define (??v) (apply choose* (gen-v p)))
   (define (??w) (apply choose* (gen-w p)))
@@ -73,8 +81,8 @@
                (op-sum-t-t (??w) (??agg (- depth 1) e)))))
   ??agg)
 
+;; TODO Generate sketch from normalized input
 
-;; TODO generate sketch from normalized input
 (define (gen-sketch ds p)
   (define ??term (gen-nonterm ds p))
   (define ??agg (gen-agg p))

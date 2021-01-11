@@ -77,7 +77,7 @@
                (op-I-BN (rel-R (??v) (??v) (??w)))
                (op-vec-get (??v) (??w) (??v))
                ;; FIXME hack here
-               (op-vec-get (??v) (??w) (op-- (??v) (??v))))
+               (op-vec-get (??v) (??w) ((??op) (??v) (??v))))
       (choose* ((??op) (??term (- depth 1)) (??term (- depth 1)))
                (op-sum-i-i (??w) (??term (- depth 1)))
                (op-sum-i-i (??v) (??term (- depth 1))))))

@@ -14,13 +14,19 @@
                                        (op-* (op-I-BN (rel-P 'p 'x 't))
                                              (op-I-BN (rel-P 'p 'y (op-+ 1 't)))))))))
 
-(define opt (op-* (op-I-BN (rel-G 't 'x))
+#;(define opt (op-* (op-I-BN (rel-G 't 'x))
                    (op-I-BN (op-leq 5 (op-sum-i-i
                                        'p
                                        (op-*
                                         (op-I-BN (rel-G 't 'x))
                                         (op-* (op-I-BN (rel-P 'p 'x 't))
                                              (op-I-BN (rel-P 'p 'y (op-+ 1 't))))))))))
+(define opt (op-I-BN (op-leq 5 (op-sum-i-i
+                                'p
+                                (op-*
+                                 (op-I-BN (rel-G 't 'x))
+                                 (op-* (op-I-BN (rel-P 'p 'x 't))
+                                       (op-I-BN (rel-P 'p 'y (op-+ 1 't)))))))))
 
 (define p1 (op-* (op-I-BN (rel-G 't 'x))
                  (op-sum-i-i

@@ -1,5 +1,7 @@
 #lang rosette
 
+(require "../ops.rkt")
+
 (define (process e)
   (match e
     [`(var ,x) x]
@@ -14,12 +16,6 @@
 
 
 (struct rel-R (x y z) #:transparent)
-(struct op-I-BT (e) #:transparent)
-(struct op-t* (x y) #:transparent)
-(struct op-t+ (x y) #:transparent)
-(struct op-sum-t-t (x y) #:transparent)
-(struct op-sum-i-t (x y) #:transparent)
-
 (struct op-weight (w x y) #:transparent)
 
 (define (get-udf f)

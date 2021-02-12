@@ -6,6 +6,15 @@
 (require "ops.rkt"
          "apsp/interpret.rkt")
 
+;; INTPUT
+#;(op-t+
+ (op-weight 'w 'x 'z)
+ (op-sum-i-t 'y (op-sum-t-t 'w1 (op-t* (op-weight 'w2 'y 'z) (op-t* 'w1 (op-I-BT (rel-R 'x 'y 'w1)))))))
+; w w1 w2: trop
+; x y z: id
+; rel-R (v) (v) (w) : trop
+; rel-E (v) (v) (w) :
+
 ;; HACK hard-coding vars and weights
 (define (var? p)
   (member p (list 'x 'y 'z)))

@@ -109,4 +109,3 @@
         (cons 'w w)
         (cons 'w1 w1)
         (cons 'w2 w2)))
-

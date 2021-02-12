@@ -2,6 +2,9 @@
 
 (require "../ops.rkt")
 
+(struct rel-R (x y z) #:transparent)
+(struct op-weight (w x y) #:transparent)
+
 (define (process e)
   (match e
     [`(var ,x) x]
@@ -13,10 +16,6 @@
     [`(sum w1 ,e) (op-sum-t-t 'w1 (process e))]
     [`(sum y ,e) (op-sum-i-t 'y (process e))]
     [`(,udf ,vs ...) (apply (get-udf udf) (map process vs))]))
-
-
-(struct rel-R (x y z) #:transparent)
-(struct op-weight (w x y) #:transparent)
 
 (define (get-udf f)
   (match f

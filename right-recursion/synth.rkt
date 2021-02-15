@@ -8,7 +8,7 @@
          "defs.rkt"
          "interp.rkt")
 
-(define (??v) (choose* 'x 'y 'z (??)))
+(define (??v) (choose* 'x 'y 'z 1))
 (define (??op) (choose* op-+ op-*))
 
 (define (??term depth)

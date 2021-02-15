@@ -67,7 +67,7 @@
 
 ;; GRAMMAR
 
-(define (??v) (choose* 'j 't 'k))
+(define (??v) (choose* 'j 't 'k (op-- 't 'k) (op-- (op-- 't 'k) 1)))
 (define (??w) (choose* 'w))
 (define (??op) (choose* op-+ op-- op-*))
 
@@ -75,9 +75,7 @@
   (if (= 0 depth)
       (choose* (??w)
                (op-I-BN (rel-R (??v) (??v) (??w)))
-               (op-vec-get (??v) (??w) (??v))
-               ;; FIXME hack here
-               (op-vec-get (??v) (??w) ((??op) (??v) (??v))))
+               (op-vec-get (??v) (??w) (??v)))
       (choose* ((??op) (??term (- depth 1)) (??term (- depth 1)))
                (op-sum-i-i (??w) (??term (- depth 1)))
                (op-sum-i-i (??v) (??term (- depth 1))))))

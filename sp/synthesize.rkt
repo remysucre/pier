@@ -111,7 +111,7 @@
                         (op-t* (op-t* (op-I-BT (rel-R 'x 'y 'w1)) 'w1)
                                (??term 0)))))))
 
-(define M
+#;(define M
   (synthesize
    #:forall (list R-i-n R-n-n E-i-n E-n-n
                   x y z
@@ -120,4 +120,4 @@
                   sum-t-i-inf-b sum-t-i-inf-i sum-t-i-i-b sum-t-i-i-i)
    #:guarantee (assert (eq? (interpret interp-prog vars sketch) (interpret interp-prog vars prog)))))
 
-(evaluate sketch M)
+;;(evaluate sketch M)

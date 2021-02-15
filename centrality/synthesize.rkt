@@ -76,8 +76,7 @@
 
 (define (??term depth)
   (if (= 0 depth)
-      (choose* (??v)
-               (op-I-BN (rel-E (??v) (??v)))
+      (choose* (op-I-BN (rel-E (??v) (??v)))
                (op-delta (??v) (??v) (??v))
                (op-sum-i-i 't
                 (op-* (op-I-BN (rel-E 'v 't))

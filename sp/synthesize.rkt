@@ -8,14 +8,19 @@
          rosette/lib/angelic    ; provides `choose*`
          rosette/lib/synthax)   ; provides `??`
 
+;; 1. declare a struct per relation & macro
+
 (struct rel-E (x y z) #:transparent)
 (struct rel-R (x y z) #:transparent)
 (struct op-weight (w x y) #:transparent)
 
+;; 2. specify how the structs map to symbols
+
 (define (get-def f)
   (match f
     ['weight op-weight]
-    ['R rel-R]))
+    ['R rel-R]
+    ['E rel-E]))
 
 #;(preprocess get-def '(+
   (weight w x z)
@@ -24,6 +29,8 @@
       (* (weight w2 y z)
         (* w1
           (I (R x y w1))))))))
+
+;; 3. extend the interpreter over relations and macros
 
 (define (interp-prog p)
   (define (interp p)
@@ -34,7 +41,7 @@
     [(rel-R x y w) (R (interp x) (interp y) (interp w))]
     [p p]))
 
-;; RELATIONS
+;; 4. declare symbolic types for the relations
 
 (define-symbolic E-i-n (~> integer? integer? boolean?))
 (define-symbolic E-n-n (~> integer? integer? real? boolean?))
@@ -44,13 +51,13 @@
 (define-symbolic R-n-n (~> integer? integer? real? boolean?))
 (define (R x y w) (if (inf? w) (R-i-n x y) (R-n-n x y w)))
 
-;; UDFs
+;; 5. define macros
 
 (define (weight w x z)
   (op-sum-t-t w
               (op-t* w (op-I-BT (rel-E x z w)))))
 
-;; VARIABLES
+;; 6. define types for variables
 
 (define-symbolic x y z integer?)
 (define-symbolic w-i w1-i w2-i boolean?)

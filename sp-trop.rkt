@@ -1,8 +1,8 @@
 #lang rosette
 
-(require "../ops.rkt"
-         "../process.rkt"
-         "../interpret.rkt")
+(require "ops.rkt"
+         "process.rkt"
+         "interpret.rkt")
 
 (require rosette/lib/destruct
          rosette/lib/angelic    ; provides `choose*`

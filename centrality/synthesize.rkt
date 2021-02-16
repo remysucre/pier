@@ -77,14 +77,13 @@
 (define (??term depth)
   (if (= 0 depth)
       (choose* (op-I-BN (rel-E (??v) (??v)))
-               (op-delta (??v) (??v) (??v))
-               (op-sum-i-i 't
-                (op-* (op-I-BN (rel-E 'v 't))
-                      (op-delta 's 'v 't))))
+               (op-delta (??v) (??v) (??v)))
       ((??op) (??term (- depth 1)) (??term (- depth 1)))))
 
 (define sketch
-  (op-+ (??term 0)
+  (op-+ (op-sum-i-i 't
+                    (op-* (op-delta 's 'v 't)
+                          (??term 0)))
         (op-sum-i-i (??v)
                 (op-sum-i-i 't
                         (op-* (op-delta 's 'v 't)

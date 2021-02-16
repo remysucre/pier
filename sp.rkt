@@ -14,15 +14,33 @@
 (struct rel-R (x y z) #:transparent)
 (struct op-weight (w x y) #:transparent)
 
-;; 2. specify how the structs map to symbols
+;; 2. declare symbolic types for the relations
 
-(define (get-def f)
-  (match f
-    ['weight op-weight]
-    ['R rel-R]
-    ['E rel-E]))
+(define-symbolic E (~> integer? integer? integer? boolean?))
+(define-symbolic R (~> integer? integer? integer? boolean?))
 
-;; 3. extend the interpreter over relations and macros
+;; 3. define macros
+
+(define (weight w x z)
+  (op-sum-i-i w (op-* w (op-I-BN (rel-E x z w)))))
+
+;; 4. define types for variables
+
+(define-symbolic x y z integer?)
+(define-symbolic w w1 w2 integer?)
+
+;; 5. map symbols to declared constructs
+
+(define vars
+  (list (cons 'x x) (cons 'y y) (cons 'z z)
+        (cons 'w w) (cons 'w1 w1) (cons 'w2 w2)))
+
+(define ops
+  (list (cons 'weight op-weight)
+        (cons 'R rel-R)
+        (cons 'E rel-E)))
+
+;; 6. extend the interpreter over relations and macros
 
 (define (interp-prog p)
   (define (interp p)
@@ -32,29 +50,6 @@
     [(rel-E x y w) (E (interp x) (interp y) (interp w))]
     [(rel-R x y w) (R (interp x) (interp y) (interp w))]
     [p p]))
-
-;; 4. declare symbolic types for the relations
-
-(define-symbolic E (~> integer? integer? integer? boolean?))
-(define-symbolic R (~> integer? integer? integer? boolean?))
-
-;; 5. define macros
-
-(define (weight w x z)
-  (op-sum-i-i w (op-* w (op-I-BN (rel-E x z w)))))
-
-;; 6. define types for variables
-
-(define-symbolic x y z integer?)
-(define-symbolic w w1 w2 integer?)
-
-(define vars
-  (list (cons 'x x)
-        (cons 'y y)
-        (cons 'z z)
-        (cons 'w w)
-        (cons 'w1 w1)
-        (cons 'w2 w2)))
 
 ;; INPUT
 
@@ -92,12 +87,6 @@
                         (??agg 0
                         (op-* (op-* (op-I-BN (rel-R 'x 'y 'w1)) 'w1)
                                (??term 0)))))))
-
-(define opt
-  (op-+ (op-weight 'w 'x 'z) (op-sum-i-i 'y (op-sum-i-i 'w1 (op-* (op-* (op-I-BN (rel-R 'x 'y 'w1)) 'w1) (op-weight 'w2 'y 'z))))))
-
-
-(verify (assert (= (interpret interp-prog vars opt) (interpret interp-prog vars prog))))
 
 (define M
   (synthesize

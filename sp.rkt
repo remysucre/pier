@@ -2,7 +2,8 @@
 
 (require "ops.rkt"
          "process.rkt"
-         "interpret.rkt")
+         "interpret.rkt"
+         "grammar.rkt")
 
 (require rosette/lib/destruct
          rosette/lib/angelic    ; provides `choose*`
@@ -65,48 +66,23 @@
 ;; +, * and additional semiring operations
 (define (??op) (choose* op-+ op-*))
 
-(define (gen-term depth vs rels op)
-  (define (??term depth)
-    (if (= 0 depth)
-      ;; terminals include variables of the semiring type,
-      ;; base relations and macros
-      (apply choose* (cons vs rels))
-      ;; non-terminals are semiring operations
-      ((op) (??term (- depth 1)) (??term (- depth 1)))))
-  (??term depth))
-
 ;; TODO rename this to factor
 (define (??term depth)
-  (gen-term depth
-            (??w)
+  (gen-term depth (??w)
             (list (op-I-BN (rel-E (??v) (??v) (??w)))
                   (op-I-BN (rel-R (??v) (??v) (??w)))
                   (op-weight (??w) (??v) (??v)))
             ??op))
 
-;; same as term, but also include aggregates
-(define (gen-factor depth vws agg term op)
-  (if (= 0 depth)
-      (term 0)
-      (choose* ((op) (term (- depth 1)) (term (- depth 1)))
-               (agg (apply choose* vws) (term (- depth 1))))))
-
 ;; factors also include aggregates
 (define (??factor depth)
   (gen-factor depth (list (??v) (??w)) op-sum-i-i ??term ??op))
 
-(define (gen-agg depth e vws agg)
-  (define (??agg depth e)
-    (if (= depth 0)
-      e
-      (agg (apply choose* vws) (??agg (- depth 1) e))))
-  (??agg depth e))
-
 ;; additional layers of aggregates
-
 (define (??agg depth e)
   (gen-agg depth e (list (??v) (??w)) op-sum-i-i))
 
+;; defined from normalized G
 (define sketch
   (op-+ (??factor 0)
         (??agg 1

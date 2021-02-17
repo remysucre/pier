@@ -8,6 +8,7 @@
   (match e
     [(? symbol? e) e]
     [`(I ,e) (op-I-BT (preprocess get-def e))]
+    [`(inv ,e) (op-inv (preprocess get-def e))]
     [`(* ,x ,y) (op-t* (preprocess get-def x) (preprocess get-def y))]
     [`(+ ,x ,y) (op-t+ (preprocess get-def x) (preprocess get-def y))]
     [`(sum-t-t ,w ,e) (op-sum-t-t w (preprocess get-def e))]

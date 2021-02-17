@@ -16,6 +16,7 @@
   (if (= 0 depth)
       (choose* (??w)
                (op-I (rel-R (??v) (??v) (??w)))
+               (op-I (rel-v (??v) (??w)))
                (op-vec-get (??v) (??w) (??v)))
       (choose* ((??op) (??term (- depth 1)) (??term (- depth 1)))
                (op-sum (??w) (??term (- depth 1)))

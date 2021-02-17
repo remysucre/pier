@@ -8,28 +8,27 @@
          rosette/lib/angelic    ; provides `choose*`
          rosette/lib/synthax)   ; provides `??`
 
-;; 1. declare a struct per relation & macro
+;; 1. declare relations and types
 
 (struct rel-E (x y z) #:transparent)
-(struct rel-R (x y z) #:transparent)
-(struct op-weight (w x y) #:transparent)
-
-;; 2. declare symbolic types for the relations
-
 (define-symbolic E (~> integer? integer? integer? boolean?))
+
+(struct rel-R (x y z) #:transparent)
 (define-symbolic R (~> integer? integer? integer? boolean?))
 
-;; 3. define macros
+;; 2. define macros
 
+(struct op-weight (w x y) #:transparent)
 (define (weight w x z)
-  (op-sum-i-i w (op-* w (op-I-BN (rel-E x z w)))))
+  (interpret interp-prog vars
+             (op-sum-i-i w (op-* w (op-I-BN (rel-E x z w))))))
 
-;; 4. define types for variables
+;; 3. define types for variables
 
 (define-symbolic x y z integer?)
 (define-symbolic w w1 w2 integer?)
 
-;; 5. map symbols to declared constructs
+;; 4. map symbols to declared constructs
 
 (define vars
   (list (cons 'x x) (cons 'y y) (cons 'z z)
@@ -40,13 +39,13 @@
         (cons 'R rel-R)
         (cons 'E rel-E)))
 
-;; 6. extend the interpreter over relations and macros
+;; 5. extend the interpreter over relations and macros
 
 (define (interp-prog p)
   (define (interp p)
     (interpret interp-prog vars p))
   (destruct p
-    [(op-weight w x y) (interp (weight (interp w) (interp x) (interp y)))]
+    [(op-weight w x y) (weight (interp w) (interp x) (interp y))]
     [(rel-E x y w) (E (interp x) (interp y) (interp w))]
     [(rel-R x y w) (R (interp x) (interp y) (interp w))]
     [p p]))
@@ -59,34 +58,62 @@
 
 ;; GRAMMAR
 
+;; all variables and ground terms of that type
 (define (??v) (choose* 'x 'y 'z))
 (define (??w) (choose* 'w 'w1 'w2))
+
+;; +, * and additional semiring operations
 (define (??op) (choose* op-+ op-*))
 
+(define (gen-term depth vs rels op)
+  (define (??term depth)
+    (if (= 0 depth)
+      ;; terminals include variables of the semiring type,
+      ;; base relations and macros
+      (apply choose* (cons vs rels))
+      ;; non-terminals are semiring operations
+      ((op) (??term (- depth 1)) (??term (- depth 1)))))
+  (??term depth))
+
+;; TODO rename this to factor
 (define (??term depth)
+  (gen-term depth
+            (??w)
+            (list (op-I-BN (rel-E (??v) (??v) (??w)))
+                  (op-I-BN (rel-R (??v) (??v) (??w)))
+                  (op-weight (??w) (??v) (??v)))
+            ??op))
+
+;; same as term, but also include aggregates
+(define (gen-factor depth vws agg term op)
   (if (= 0 depth)
-      (choose* (??w)
-               (op-I-BN (rel-E (??v) (??v) (??w)))
-               (op-I-BN (rel-R (??v) (??v) (??w)))
-               (op-weight (??w) (??v) (??v)))
-      (choose* ((??op) (??term (- depth 1)) (??term (- depth 1)))
-               #;(op-sum-t-t (??w) (??term (- depth 1)))
-               (op-sum-i-i (??v) (??term (- depth 1))))))
+      (term 0)
+      (choose* ((op) (term (- depth 1)) (term (- depth 1)))
+               (agg (apply choose* vws) (term (- depth 1))))))
+
+;; factors also include aggregates
+(define (??factor depth)
+  (gen-factor depth (list (??v) (??w)) op-sum-i-i ??term ??op))
+
+(define (gen-agg depth e vws agg)
+  (define (??agg depth e)
+    (if (= depth 0)
+      e
+      (agg (apply choose* vws) (??agg (- depth 1) e))))
+  (??agg depth e))
+
+;; additional layers of aggregates
 
 (define (??agg depth e)
-  (if (= depth 0)
-      e
-      (choose*
-        (op-sum-i-i (??v) (??agg (- depth 1) e))
-        (op-sum-i-i (??w) (??agg (- depth 1) e)))))
+  (gen-agg depth e (list (??v) (??w)) op-sum-i-i))
 
 (define sketch
-  (op-+ (??term 0)
-     (??agg 1
-            (op-sum-i-i 'w1
-                        (??agg 0
-                        (op-* (op-* (op-I-BN (rel-R 'x 'y 'w1)) 'w1)
-                               (??term 0)))))))
+  (op-+ (??factor 0)
+        (??agg 1
+               (op-sum-i-i 'w1
+                           (??agg 0
+                                  (op-* (op-* (op-I-BN (rel-R 'x 'y 'w1)) 'w1)
+                                        (??term 0)))))))
 
 (define M
   (synthesize

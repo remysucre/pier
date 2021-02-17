@@ -45,7 +45,8 @@
      (op-inv (rel-sigma 's 'u))
      (op-* (rel-sigma 's 'v) (op-* (op-* (rel-sigma 't 'u) (op-I-BN (rel-E 'v 't))) (op-I-BN (op-eq? (rel-D 'v 'u) (op-+ 1 (rel-D 't 'u)))))))))))
   (op-+ (op-sum-i-i 't (op-* (op-I-BN (rel-E 'v 't))
-                         (op-/ (op-sigma 's 'v 't)
+                             (op-delta 's 'v 't)
+                         #;(op-/ (op-sigma 's 'v 't)
                                (rel-sigma 's 't))))
         (op-sum-i-i 'u
                 (op-sum-i-i 't
@@ -72,11 +73,12 @@
 ;; GRAMMAR
 
 (define (??v) (choose* 's 'u 'v 't))
-(define (??op) (choose* op-+ op-*))
+(define (??op) (choose* op-+ op-* op-/))
 
 (define (??term depth)
   (if (= 0 depth)
       (choose* (op-I-BN (rel-E (??v) (??v)))
+               (op-I-BN (rel-sigma (??v) (??v)))
                (op-delta (??v) (??v) (??v)))
       ((??op) (??term (- depth 1)) (??term (- depth 1)))))
 

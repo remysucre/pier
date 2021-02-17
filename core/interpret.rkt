@@ -6,7 +6,7 @@
 (provide (all-defined-out))
 
 ;; COMMON DEFINITIONS
-(define (interpret interp-prog vars p)
+(define (interpret vars rels ops p)
   (define (interp p)
   (destruct p
     [(op-I-BN e) (I-BN (interp e))]
@@ -26,6 +26,11 @@
     [(op-sum-i-t v e) (sum-i-t (interp v) (interp e))]
     [(op-sum-t-t v e) (sum-t-t (interp v) (interp e))]
     [(op-exists v e) (exist (interp v) (interp e))]
+    ;; relations
+    [(rel r xs) (apply (cdr (assoc r rels)) (map interp xs))]
+    ;; UDF
+    [(op f xs) (interp (apply (cdr (assoc f ops)) (map interp xs)))]
+    ;; variables and constants
     [_ (define result (assoc p vars))
-       (if result (cdr result) (interp-prog p))]))
+       (if result (cdr result) p)]))
   (interp p))

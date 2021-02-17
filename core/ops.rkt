@@ -2,6 +2,9 @@
 
 (provide (all-defined-out))
 
+(struct rel (r xs) #:transparent)
+(struct op (f xs) #:transparent)
+
 (struct op-I-BN (x) #:transparent)
 (struct op-I-BT (x) #:transparent)
 

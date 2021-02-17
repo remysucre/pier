@@ -93,10 +93,7 @@
 
 (define M
   (synthesize
-   #:forall (list R E
-                  x y z
-                  w w1 w2
-                  sum-i-i)
+   #:forall (list R E x y z w w1 w2 sum-i-i)
    #:guarantee (assert (eq? (interpret interp-prog vars sketch) (interpret interp-prog vars prog)))))
 
 (evaluate sketch M)

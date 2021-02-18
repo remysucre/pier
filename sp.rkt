@@ -1,37 +1,24 @@
 #lang rosette
 
-(require "core/ops.rkt"
-         "core/process.rkt"
-         "core/interpret.rkt"
-         "core/grammar.rkt")
-
-(require rosette/lib/destruct
-         rosette/lib/angelic    ; provides `choose*`
-         rosette/lib/synthax)   ; provides `??`
+(require "core/ops.rkt" "core/process.rkt" "core/interpret.rkt" "core/grammar.rkt" "core/macro.rkt")
+(require rosette/lib/angelic) ;; provide choose*
 
 ;; 1. declare relations and types
-(define-symbolic E (~> integer? integer? integer? boolean?))
-(define-symbolic R (~> integer? integer? integer? boolean?))
+(decl rel E (~> integer? integer? integer? boolean?))
+(decl rel R (~> integer? integer? integer? boolean?))
 
 ;; 2. define macros
-(define (weight w x z)
-  (op-sum-i-i w (op-* w (op-I-BN (rel 'E (list x z w))))))
+(def fun (weight w x z)
+  (op-sum-i-i w (op-* w (op-I-BN (op-rel 'E (list x z w))))))
 
 ;; 3. define types for variables
-(define-symbolic x y z integer?)
-(define-symbolic w w1 w2 integer?)
+(decl var x integer?)
+(decl var y integer?)
+(decl var z integer?)
 
-;; 4. map symbols to declared constructs
-(define vars
-  (list (cons 'x x) (cons 'y y) (cons 'z z)
-        (cons 'w w) (cons 'w1 w1) (cons 'w2 w2)))
-
-(define rels
-  (list (cons 'R R)
-        (cons 'E E)))
-
-(define ops
-  (list (cons 'weight weight)))
+(decl var w integer?)
+(decl var w1 integer?)
+(decl var w2 integer?)
 
 ;; INPUT
 
@@ -41,7 +28,7 @@
          (op-sum-i-i 'w1
           (op-* (op 'weight '(w2 y z))
                 (op-* 'w1
-                      (op-I-BN (rel 'R '(x y w1)))))))))
+                      (op-I-BN (op-rel 'R '(x y w1)))))))))
 
 ;; GRAMMAR
 
@@ -55,8 +42,8 @@
 ;; TODO rename this to factor
 (define (??term depth)
   (gen-term depth (??w)
-            (list (op-I-BN (rel 'E (list (??v) (??v) (??w))))
-                  (op-I-BN (rel 'R (list (??v) (??v) (??w))))
+            (list (op-I-BN (op-rel 'E (list (??v) (??v) (??w))))
+                  (op-I-BN (op-rel 'R (list (??v) (??v) (??w))))
                   (op 'weight (list (??w) (??v) (??v))))
             ??op))
 
@@ -74,10 +61,10 @@
         (??agg 1
                (op-sum-i-i 'w1
                            (??agg 0
-                                  (op-* (op-* (op-I-BN (rel 'R '(x y w1))) 'w1)
+                                  (op-* (op-* (op-I-BN (op-rel 'R '(x y w1))) 'w1)
                                         (??term 0)))))))
 
-(define (interp p) (interpret vars rels ops p))
+(define (interp p) (interpret (unbox var) (unbox rel) (unbox fun) p))
 
 (define M
   (synthesize

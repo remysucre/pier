@@ -31,7 +31,7 @@
   (??agg depth e))
 
 
-(define (gen-grammar var-type rel-type ops var rel fun)
+(define (gen-grammar var-type rel-type fun-type ops var rel fun)
   (define (??v t) (apply choose* (hash-ref var-type t)))
   (define (??op) (apply choose* ops))
   (define (??factor depth)
@@ -46,18 +46,20 @@
   (define (??agg depth e)
     (gen-agg depth e (map ??v (hash-keys var-type)) op-sum))
 
-  (define (gen-rel)
-    (list (op-I (op-rel (choose* (hash-ref rel 'E) (hash-ref rel 'R)) (list (??v 'id?) (??v 'id?) (??v 'int?))))))
-  #;(define (gen-rel)
+ (define (gen-rel)
     (define (gr r)
       (match r
         [(cons ts t)
          (let ([rl (op-rel (apply choose* (hash-ref rel-type r)) (map ??v ts))])
-           (rl))]))
-    (map gr (hash-keys rel)))
+           (match t
+             ['bool? (list (op-I rl))]
+             ['int? (list rl)]))]))
+    (map gr (hash-keys rel-type)))
 
   (define (gen-fun)
-    (list (op (hash-ref fun 'weight) (list (??v 'int?) (??v 'id?) (??v 'id?)))))
+    (define (gf f)
+      (op (hash-ref fun f) (map ??v (hash-ref fun-type f))))
+    (map gf (hash-keys fun)))
 
   (define sketch
     (op-+ (??term 0)

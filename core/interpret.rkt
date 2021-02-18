@@ -27,10 +27,9 @@
     [(op-sum-t-t v e) (sum-t-t (interp v) (interp e))]
     [(op-exists v e) (exist (interp v) (interp e))]
     ;; relations
-    [(op-rel r xs) (apply (cdr (assoc r rels)) (map interp xs))]
+    [(op-rel r xs) (apply r (map interp xs))]
     ;; UDF
-    [(op f xs) (interp (apply (cdr (assoc f ops)) xs))]
+    [(op f xs) (interp (apply f xs))]
     ;; variables and constants
-    [_ (define result (assoc p vars))
-       (if result (cdr result) p)]))
+    [p p]))
   (interp p))

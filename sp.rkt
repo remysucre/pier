@@ -8,23 +8,23 @@
 (decl var w w1 w2 int?)
 
 (def fun (weight w x z)
-  (op-sum-i-i w (op-* w (op-I-BN (op-rel 'E (list x z w))))))
+  (op-sum-i-i w (op-* w (op-I-BN (op-rel E (list x z w))))))
 
 ;; INPUT
 
 (define prog
-  (op-+ (op 'weight '(w x z))
-        (op-sum-i-i 'y
-         (op-sum-i-i 'w1
-          (op-* (op 'weight '(w2 y z))
-                (op-* 'w1
-                      (op-I-BN (op-rel 'R '(x y w1)))))))))
+  (op-+ (op weight (list w x z))
+        (op-sum-i-i y
+         (op-sum-i-i w1
+          (op-* (op weight (list w2 y z))
+                (op-* w1
+                      (op-I-BN (op-rel R (list x y w1)))))))))
 
 ;; GRAMMAR
 
 ;; all variables and ground terms of that type
-(define (??v) (choose* 'x 'y 'z))
-(define (??w) (choose* 'w 'w1 'w2))
+(define (??v) (choose* x y z))
+(define (??w) (choose* w w1 w2))
 
 ;; +, * and additional semiring operations
 (define (??op) (choose* op-+ op-*))
@@ -32,9 +32,9 @@
 ;; TODO rename this to factor
 (define (??term depth)
   (gen-term depth (??w)
-            (list (op-I-BN (op-rel 'E (list (??v) (??v) (??w))))
-                  (op-I-BN (op-rel 'R (list (??v) (??v) (??w))))
-                  (op 'weight (list (??w) (??v) (??v))))
+            (list (op-I-BN (op-rel E (list (??v) (??v) (??w))))
+                  (op-I-BN (op-rel R (list (??v) (??v) (??w))))
+                  (op weight (list (??w) (??v) (??v))))
             ??op))
 
 ;; factors also include aggregates
@@ -49,9 +49,9 @@
 (define sketch
   (op-+ (??factor 0)
         (??agg 1
-               (op-sum-i-i 'w1
+               (op-sum-i-i w1
                            (??agg 0
-                                  (op-* (op-* (op-I-BN (op-rel 'R '(x y w1))) 'w1)
+                                  (op-* (op-* (op-I-BN (op-rel R (list x y w1))) w1)
                                         (??term 0)))))))
 
 (define (interp p) (interpret (unbox var) (unbox rel) (unbox fun) p))

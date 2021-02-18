@@ -5,11 +5,14 @@
 (define rel (box (list)))
 (define var (box (list)))
 (define fun (box (list)))
+(define vars (box (list)))
 
-(define-syntax-rule (decl kind name type)
+(define-syntax-rule (decl kind x ... type)
   (begin
-    (define-symbolic name type)
-    (set-box! kind (cons (cons 'name name) (unbox kind)))))
+    (define-symbolic x ... type)
+    (set-box! kind (append (list (cons 'x x) ... ) (unbox kind)))
+    (cond [(assoc (car (list 'x ...)) (unbox var))
+           (set-box! vars (cons (list 'x ...) (unbox vars)))])))
 
 (define-syntax-rule (def op (f xs ...) e)
   (begin

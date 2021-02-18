@@ -12,13 +12,8 @@
   (op-sum-i-i w (op-* w (op-I-BN (op-rel 'E (list x z w))))))
 
 ;; 3. define types for variables
-(decl var x integer?)
-(decl var y integer?)
-(decl var z integer?)
-
-(decl var w integer?)
-(decl var w1 integer?)
-(decl var w2 integer?)
+(decl var x y z integer?)
+(decl var w w1 w2 integer?)
 
 ;; INPUT
 

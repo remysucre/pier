@@ -16,7 +16,7 @@
       ((op) (??factor (- depth 1)) (??factor (- depth 1)))))
   (??factor depth))
 
-;; same as term, but also include aggregates
+;; same as factor, but also include aggregates
 (define (gen-term depth vws agg term op)
   (if (= 0 depth)
       (term 0)
@@ -31,7 +31,7 @@
   (??agg depth e))
 
 
-(define (gen-grammar var-type rel-type fun-type ops var rel fun)
+(define (gen-grammar var-type rel-type fun-type ops var rel fun g)
   (define (??v t) (apply choose* (hash-ref var-type t)))
   (define (??op) (apply choose* ops))
   (define (??factor depth)
@@ -61,14 +61,15 @@
       (op (hash-ref fun f) (map ??v (hash-ref fun-type f))))
     (map gf (hash-keys fun)))
 
-  (define sketch
-    (op-+ (??term 0)
+  #;(sum w1 (* (* (I (R x y w1)) w1)))
+
+  (define (sketch g)
+    (match g
+      [(op-sum w e)
+       (op-+ (??term 0)
         (??agg 1
-               (op-sum (hash-ref var 'w1)
+               (op-sum w
                        (??agg 0
-                              (op-* (op-* (op-I (op-rel (hash-ref rel 'R) (list (hash-ref var 'x)
-                                                                                (hash-ref var 'y)
-                                                                                (hash-ref var 'w1))))
-                                          (hash-ref var 'w1))
-                                    (??factor 0)))))))
-  sketch)
+                              (op-* e (??factor 0))))))]))
+
+  (sketch g))

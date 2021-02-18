@@ -1,16 +1,16 @@
 #lang rosette
+(require "core/lib.rkt")
 
-(require "core/ops.rkt" "core/interpret.rkt" "core/grammar.rkt" "core/macro.rkt")
-(require rosette/lib/angelic) ;; provide choose*
-
+;; declare the types of relations and variables
 (decl rel E R (~> id? id? int? bool?))
 (decl var x y z id?)
 (decl var w w1 w2 int?)
 
-(def fun (weight w x z) (sum w (* w (I (E x z w)))))
+;; define helper functions
+(def fun (weight w x z)
+  (sum w (* w (I (E x z w)))))
 
-;; INPUT
-
+;; normalized input program g.f
 (define p
   (+ (weight w x z)
      (sum y
@@ -18,12 +18,8 @@
                (* (weight w2 y z)
                   (* w1 (I (R x y w1))))))))
 
+;; normalized g
+(define g
+  '(sum w1 (* w1 (I (R x y w1)))))
 
-(define sketch (gen-grammar var-type rel-type fun-type (list op-+ op-*) var rel fun))
-
-(define M
-  (synthesize
-   #:forall (list R E x y z w w1 w2 sum)
-   #:guarantee (assert (eq? (interpret sketch) p))))
-
-(evaluate sketch M)
+(optimize p g)

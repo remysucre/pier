@@ -7,58 +7,56 @@
 (decl var x y z id?)
 (decl var w w1 w2 int?)
 
-(def fun (weight w x z)
-  (op-sum w (op-* w (op-I (op-rel E (list x z w))))))
+(def fun (weight w x z) (sum w (* w (I (E x z w)))))
+
+rel-type
 
 ;; INPUT
 
-(define prog
-  (op-+ (op weight (list w x z))
-        (op-sum y
-         (op-sum w1
-          (op-* (op weight (list w2 y z))
-                (op-* w1
-                      (op-I (op-rel R (list x y w1)))))))))
+(define p
+  (+ (weight w x z)
+     (sum y
+          (sum w1
+               (* (weight w2 y z)
+                  (* w1 (I (R x y w1))))))))
 
 ;; GRAMMAR
 
-;; all variables and ground terms of that type
-(define (??v) (choose* x y z))
-(define (??w) (choose* w w1 w2))
+;; ;; all variables and ground terms of that type
+;; (define (??v t) (apply choose* (hash-ref var-type t)))
 
-;; +, * and additional semiring operations
-(define (??op) (choose* op-+ op-*))
+;; ;; +, * and additional semiring operations
+;; (define (??op) (choose* op-+ op-*))
 
-;; TODO rename this to factor
-(define (??term depth)
-  (gen-term depth (??w)
-            (list (op-I (op-rel E (list (??v) (??v) (??w))))
-                  (op-I (op-rel R (list (??v) (??v) (??w))))
-                  (op weight (list (??w) (??v) (??v))))
-            ??op))
+;; ;; TODO rename this to factor
+;; (define (??term depth)
+;;   (gen-term depth (??v 'int?)
+;;             (list (op-I (op-rel (choose* E R) (list (??v 'id?) (??v 'id?) (??v 'int?))))
+;;                   (op weight (list (??v 'int?) (??v 'id?) (??v 'id?))))
+;;             ??op))
 
-;; factors also include aggregates
-(define (??factor depth)
-  (gen-factor depth (list (??v) (??w)) op-sum ??term ??op))
+;; ;; factors also include aggregates
+;; (define (??factor depth)
+;;   (gen-factor depth (list (??v 'id?) (??v 'int?)) op-sum ??term ??op))
 
-;; additional layers of aggregates
-(define (??agg depth e)
-  (gen-agg depth e (list (??v) (??w)) op-sum))
+;; ;; additional layers of aggregates
+;; (define (??agg depth e)
+;;   (gen-agg depth e (list (??v 'id?) (??v 'int?)) op-sum))
 
-;; defined from normalized G
-(define sketch
-  (op-+ (??factor 0)
-        (??agg 1
-               (op-sum w1
-                           (??agg 0
-                                  (op-* (op-* (op-I (op-rel R (list x y w1))) w1)
-                                        (??term 0)))))))
+;; ;; defined from normalized G
+;; (define sketch
+;;   (op-+ (??factor 0)
+;;         (??agg 1
+;;                (op-sum w1
+;;                        (??agg 0
+;;                               (op-* (op-* (op-I (op-rel R (list x y w1))) w1)
+;;                                     (??term 0)))))))
 
-(define (interp p) (interpret (unbox var) (unbox rel) (unbox fun) p))
+(define sketch (gen-grammar var-type rel-type (list op-+ op-*) var rel fun))
 
 (define M
   (synthesize
    #:forall (list R E x y z w w1 w2 sum)
-   #:guarantee (assert (eq? (interp sketch) (interp prog)))))
+   #:guarantee (assert (eq? (interpret sketch) p))))
 
 (evaluate sketch M)

@@ -6,25 +6,23 @@
 (provide (all-defined-out))
 
 ;; COMMON DEFINITIONS
-(define (interpret vars rels ops p)
-  (define (interp p)
+(define (interpret p)
   (destruct p
-    [(op-I e) (I (interp e))]
-    [(op-&& x y) (&& (interp x) (interp y))]
-    [(op-|| x y) (|| (interp x) (interp y))]
-    [(op-+ x y) (+ (interp x) (interp y))]
-    [(op-- x y) (- (interp x) (interp y))]
-    [(op-* x y) (* (interp x) (interp y))]
-    [(op-/ x y) (* (interp x) (interp (op-inv (interp y))))]
-    [(op-inv x) (inv (interp x))]
-    [(op-leq x y) (<= (interp x) (interp y))]
-    [(op-eq? x y) (eq? (interp x) (interp y))]
-    [(op-sum v e) (sum (interp v) (interp e))]
-    [(op-exists v e) (exist (interp v) (interp e))]
+    [(op-I e) (I (interpret e))]
+    [(op-&& x y) (&& (interpret x) (interpret y))]
+    [(op-|| x y) (|| (interpret x) (interpret y))]
+    [(op-+ x y) (+ (interpret x) (interpret y))]
+    [(op-- x y) (- (interpret x) (interpret y))]
+    [(op-* x y) (* (interpret x) (interpret y))]
+    [(op-/ x y) (* (interpret x) (interpret (op-inv y)))]
+    [(op-inv x) (inv (interpret x))]
+    [(op-leq x y) (<= (interpret x) (interpret y))]
+    [(op-eq? x y) (eq? (interpret x) (interpret y))]
+    [(op-sum v e) (sum (interpret v) (interpret e))]
+    [(op-exists v e) (exist (interpret v) (interpret e))]
     ;; relations
-    [(op-rel r xs) (apply r (map interp xs))]
+    [(op-rel r xs) (apply r (map interpret xs))]
     ;; UDF
-    [(op f xs) (interp (apply f xs))]
+    [(op f xs) (apply f xs)]
     ;; variables and constants
     [p p]))
-  (interp p))

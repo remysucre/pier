@@ -3,17 +3,12 @@
 (require "core/ops.rkt" "core/process.rkt" "core/interpret.rkt" "core/grammar.rkt" "core/macro.rkt")
 (require rosette/lib/angelic) ;; provide choose*
 
-;; 1. declare relations and types
-(decl rel E (~> integer? integer? integer? boolean?))
-(decl rel R (~> integer? integer? integer? boolean?))
+(decl rel E R (~> id? id? int? bool?))
+(decl var x y z id?)
+(decl var w w1 w2 int?)
 
-;; 2. define macros
 (def fun (weight w x z)
   (op-sum-i-i w (op-* w (op-I-BN (op-rel 'E (list x z w))))))
-
-;; 3. define types for variables
-(decl var x y z integer?)
-(decl var w w1 w2 integer?)
 
 ;; INPUT
 

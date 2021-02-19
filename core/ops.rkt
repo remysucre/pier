@@ -26,5 +26,4 @@
 (define-symbolic sum (~> integer? integer? integer?))
 (define-symbolic exist (~> integer? boolean? boolean?))
 
-;; #t => 0, #f => infty
 (define (I b) (if b 1 0))

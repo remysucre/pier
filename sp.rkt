@@ -7,7 +7,7 @@
 (decl var w w1 w2 int?)
 
 ;; define helper functions
-(def fun (weight w x z)
+(def (weight w x z)
   (sum w (* w (I (E x z w)))))
 
 ;; normalized input program g.f
@@ -20,6 +20,6 @@
 
 ;; normalized g
 (define g
-  '(sum w1 (* w1 (I (R x y w1)))))
+  (op-sum w1 (op-* w1 (op-I (op-rel R (list x y w1))))))
 
 (optimize p g)

@@ -6,11 +6,11 @@
 
 (provide (all-defined-out))
 
-(define (gen-grammar type->var type->rel fun->type ops var rel fun g)
+(define (gen-grammar type->var type->rel fun->type ops g)
   (define (??var t) (apply choose* (hash-ref type->var t)))
 
   (define (??w) (apply choose* (hash-ref type->var 'int?))) ;; weights
-  (define (??v) (apply choose* (hash-values var)))         ;; all vars
+  (define (??v) (apply choose* (apply append (hash-values type->var))))         ;; all vars
   (define (??o) (apply choose* ops))
 
   (define (??factor depth)
@@ -40,10 +40,10 @@
     (map gen-rel (hash->list type->rel)))
 
   (define (??fun)
-    (define (gf sf)
-      (match sf
-        [(cons s f) (op f (map ??var (hash-ref fun->type s)))]))
-    (map gf (hash->list fun)))
+    (define (gf ft)
+      (match ft
+        [(cons f t) (op f (map ??var t))]))
+    (map gf (hash->list fun->type)))
 
   ;; FIXME only 1 level of aggregate
   (define (sketch g)

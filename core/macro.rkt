@@ -32,14 +32,13 @@
 (define-syntax-rule (def (f x ...) e)
   (begin (define (f x ...) e)
          (hash-set! fun 'f f)
-         (hash-set! fun->type 'f (list (hash-ref var->type x) ...))))
+         (hash-set! fun->type f (list (hash-ref var->type x) ...))))
 
 (define (optimize p g)
   (define sketch (gen-grammar type->var
                               type->rel
                               fun->type
                               (list op-+ op-*)
-                              var rel fun
                               g))
 
   (define M

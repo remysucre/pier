@@ -39,7 +39,8 @@
                               type->rel
                               fun->type
                               #;(list op-+ op-*)
-                              (list op-+ op-* op-/)
+                              ;; (list op-+ op-* op-/)
+                              (list + * div)
                               g))
 
   (define M
@@ -47,7 +48,7 @@
      #:forall (append (hash-values rel)
                       (hash-values var)
                       (hash-values fun)
-                      (list sum))
-     #:guarantee (assert (eq? (interpret sketch) p))))
+                      (list sum inv))
+     #:guarantee (assert (eq? sketch #;(interpret sketch) p))))
 
   (evaluate sketch M))

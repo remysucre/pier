@@ -47,7 +47,7 @@
      #:forall (append (hash-values rel)
                       (hash-values var)
                       (hash-values fun)
-                      (list sum))
+                      (list sum inv))
      #:guarantee (assert (eq? (interpret sketch) p))))
 
   (evaluate sketch M))

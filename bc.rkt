@@ -45,4 +45,4 @@
                                 (* (delta s v t)
                                    (delta s t u)))))))
 
-(optimize opt g)
+(optimize p g)

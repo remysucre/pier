@@ -38,7 +38,8 @@
   (define sketch (gen-grammar type->var
                               type->rel
                               fun->type
-                              (list op-+ op-*)
+                              #;(list op-+ op-*)
+                              (list op-+ op-* op-/)
                               g))
 
   (define M

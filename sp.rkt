@@ -19,7 +19,6 @@
                   (* w1 (I (R x y w1))))))))
 
 ;; normalized g
-(define g
-  (op-sum w1 (op-* w1 (op-I (op-rel R (list x y w1))))))
+(define g (op-sum w1 (op-* w1 (op-I (op-rel R (list x y w1))))))
 
 (optimize p g)

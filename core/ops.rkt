@@ -27,3 +27,4 @@
 (define-symbolic exist (~> integer? boolean? boolean?))
 
 (define (I b) (if b 1 0))
+(define (div x y) (* x (inv y)))

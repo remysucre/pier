@@ -14,7 +14,7 @@
     [(op-+ x y) (+ (interpret x) (interpret y))]
     [(op-- x y) (- (interpret x) (interpret y))]
     [(op-* x y) (* (interpret x) (interpret y))]
-    [(op-/ x y) (* (interpret x) (interpret (op-inv y)))]
+    [(op-/ x y) (div (interpret x) (interpret y))]
     [(op-inv x) (inv (interpret x))]
     [(op-leq x y) (<= (interpret x) (interpret y))]
     [(op-eq? x y) (eq? (interpret x) (interpret y))]

@@ -81,4 +81,4 @@
 
 ;; (evaluate sketch M)
 
-(optimize opt g)
+(optimize p g)

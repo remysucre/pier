@@ -8,10 +8,6 @@
 
 (decl var s t u v id?)
 
-#;(def (sig s v t)
-  (* (* (sigma s v) (sigma v t))
-     (I (eq? (D s t) (+ (D s v) (D v t))))))
-
 (def (delta s v t)
   (* (* (* (sigma s v) (sigma v t))
         (I (eq? (D s t) (+ (D s v) (D v t)))))

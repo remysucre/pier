@@ -10,23 +10,20 @@
 (decl var s t u v id?)
 
 (def (delta s v t)
-  (* (* (* (sigma s v) (sigma v t))
+  (/ (* (* (sigma s v) (sigma v t))
         (I (eq? (D s t) (+ (D s v) (D v t)))))
-     (inv (sigma s t))))
+     (sigma s t)))
 
 (assert (forall (list s t u) (<= (D s u) (+ (D s t) (D t u)))))
 (assert (forall (list s t) (<=> (E s t) (= 1 (D s t)))))
 (assert (forall (list s t) (<=> (E s t) (= 1 (sigma s t)))))
-
-(assert (= (* (inv (sigma s u)) (sigma s u)) 1))
-(assert (= (* (inv (sigma s t)) (sigma s t)) 1))
 
 (define p
   (+ (sum t (* (I (E v t))
                (delta s v t)))
      (sum u
           (sum t
-               (div (* (* (I (E v t))
+               (/ (* (* (I (E v t))
                           (* (I (eq? (D s u)
                                      (+ (D s v) (D v u))))
                              (I (eq? (D v u)
@@ -35,6 +32,15 @@
                     (sigma s u))))))
 
 (define g (op-sum t (op delta (list s v t))))
+
+(define opt
+  (+ (sum t (* (I (E v t))
+               (delta s v t)))
+     (sum u (sum t (* (I (E v t))
+                      (* (delta s v t)
+                         (delta s t u)))))))
+
+(verify (assert (eq? opt p)))
 
 ;; (define (pick ts)
 ;;     (let ([vss (apply cartesian-product (map (curry hash-ref type->var) ts))])
@@ -65,4 +71,4 @@
 
 ;; (evaluate sketch M)
 
-(optimize p g)
+#;(optimize p g)

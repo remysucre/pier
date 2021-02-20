@@ -1,5 +1,6 @@
 #lang rosette
 (require "core/lib.rkt")
+(require rosette/lib/angelic) ; provides `choose*`
 
 ;; HACK shadowing D
 (decl rel D (~> id? id? int?))
@@ -34,5 +35,34 @@
                     (sigma s u))))))
 
 (define g (op-sum t (op delta (list s v t))))
+
+;; (define (pick ts)
+;;     (let ([vss (apply cartesian-product (map (curry hash-ref type->var) ts))])
+;;       (apply choose* (filter (negate check-duplicates) vss))))
+
+;; (define (??factor d)
+;;   (if (= 0 d)
+;;       (choose* (let ([r (choose* (lambda (vs) (op-rel sigma vs))
+;;                                  (lambda (vs) (op-I (op-rel E vs))))])
+;;                  (r (pick '(id? id?))))
+;;                (op delta (pick '(id? id? id?))))
+;;       ((choose* op-+ op-* op-/) (??factor (- d 1)) (??factor (- d 1)))))
+
+;; (define sketch
+;;   (op-+ (op-sum t (op-* (op delta (list s v t))
+;;                         (??factor 0)))
+;;         (op-sum (choose* s v t u)
+;;                 (op-sum t
+;;                         (op-* (op delta (list s v t)) (??factor 1))))))
+
+;; (define M
+;;   (synthesize
+;;    #:forall (append (hash-values rel)
+;;                     (hash-values var)
+;;                     (hash-values fun)
+;;                     (list sum inv))
+;;    #:guarantee (assert (eq? (interpret sketch) p))))
+
+;; (evaluate sketch M)
 
 (optimize p g)

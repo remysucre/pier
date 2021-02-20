@@ -8,6 +8,9 @@
 
 (define (gen-grammar type->var type->rel fun->type ops g)
   (define (??var t) (apply choose* (hash-ref type->var t)))
+  (define (??vars ts)
+    (let ([vss (apply cartesian-product (map (curry hash-ref type->var) ts))])
+      (apply choose* (filter (negate check-duplicates) vss))))
 
   (define ws (hash-ref type->var 'int? (list))) ;; weights
   (define (??v) (apply choose* (apply append (hash-values type->var))))         ;; all vars
@@ -17,13 +20,13 @@
     (define (gen-rel tr)
       (match tr
         [(cons (cons ts t) rs)
-         (let ([r (op-rel (apply choose* rs) (map ??var ts))])
+         (let ([r (op-rel (apply choose* rs) (??vars ts) #;(map ??var ts))])
            (match t ['bool? (op-I r)] ['int? r]))]))
     (map gen-rel (hash->list type->rel)))
 
   (define (??fun)
     (define (gen-fun ft)
-      (match ft [(cons f t) (op f (map ??var t))]))
+      (match ft [(cons f ts) (op f (??vars ts)#;(map ??var t))]))
     (map gen-fun (hash->list fun->type)))
 
   (define (??factor depth)

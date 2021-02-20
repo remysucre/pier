@@ -37,10 +37,9 @@
                        (* (sigma s v) (sigma t u)))
                     (sigma s u))))))
 
-#;(define g (op-sum t (op-* (op delta (list s v t)) (I (E v t)))))
 (define g (op-sum t (op delta (list s v t))))
 
-(define opt (+ (sum t (* (I (E v t)) (delta s v t)))
+#;(define opt (+ (sum t (* (I (E v t)) (delta s v t)))
                (sum u (sum t (* (I (E v t))
                                 (* (delta s v t)
                                    (delta s t u)))))))

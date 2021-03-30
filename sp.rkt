@@ -28,19 +28,27 @@
 
 ;; TODO infer output names (r,x,z)
 ;; g(f(R))(x,z)
-(g (curry f r) 'x 'z)
-
-(serialize (g (curry f r) 'x 'z) rel var fun)
+#;(serialize (g (curry f r) 'x 'z) rel var fun)
 
 ;; normalized input program g.f
-(define p
+#;(define p
   (+ (weight w x z)
      (sum y
           (sum w1
                (* (weight w2 y z)
                   (* w1 (I (R x y w1))))))))
 
+(define ngf
+  '(+ (weight (var w) (var x) (var z))
+      (sum y
+           (sum w1
+                (* (weight (var w2) (var y) (var z))
+                   (* (var w1) (I (rel R (var x) (var y) (var w1)))))))))
+
+(define p (interpret (preprocess (deserialize ngf) var rel fun)))
+p
+
 ;; normalized (g R)
 (define (ng w) (op-sum w (op-* w (op-I (op-rel R (list x y w))))))
 
-;; (optimize p ng)
+(optimize p ng)

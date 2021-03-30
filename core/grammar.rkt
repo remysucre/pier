@@ -46,7 +46,7 @@
       (op-sum (??v) (??agg (- depth 1) e))))
 
   ;; FIXME only 1 level of aggregate
-  (define (sketch g)
+  #;(define (sketch g)
     (match g
       [(op-sum w e)
        (op-+ (op-sum w (op-* e (??factor 0)))
@@ -54,8 +54,8 @@
                     (op-sum w
                             (??agg 0
                                    (op-* e (??factor 1))))))]))
-  #;(define (sketch g)
-    (match g
+  (define (sketch g)
+    (match (g (apply choose* ws))
       [(op-sum w e)
        (op-+ (??term 0)
              (??agg 1

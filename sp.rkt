@@ -30,6 +30,8 @@
 ;; g(f(R))(x,z)
 (g (curry f r) 'x 'z)
 
+(serialize (g (curry f r) 'x 'z) rel var fun)
+
 ;; normalized input program g.f
 (define p
   (+ (weight w x z)

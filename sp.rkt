@@ -26,27 +26,15 @@
 (define (g S x z)
   `(sum w (* ,(S x z 'w) w)))
 
-;; TODO infer output names (r,x,z)
-;; g(f(R))(x,z)
-#;(serialize (g (curry f r) 'x 'z) rel var fun)
+(define o (open-output-file #:exists 'replace "/home/remywang/projects/pier/temp"))
+(write (serialize (g (curry f r) 'x 'z) rel var fun) o)
+(close-output-port o)
 
-;; normalized input program g.f
-#;(define p
-  (+ (weight w x z)
-     (sum y
-          (sum w1
-               (* (weight w2 y z)
-                  (* w1 (I (R x y w1))))))))
+(define semiring-out (string-join (string-split (with-output-to-string (λ() (system "/home/remywang/projects/semiring/target/release/semiring < /home/remywang/projects/pier/temp"))) "\n")))
 
-(define ngf
-  '(+ (weight (var w) (var x) (var z))
-      (sum y
-           (sum w1
-                (* (weight (var w2) (var y) (var z))
-                   (* (var w1) (I (rel R (var x) (var y) (var w1)))))))))
+(define normalized (read (open-input-string semiring-out)))
 
-(define p (interpret (preprocess (deserialize ngf) var rel fun)))
-p
+(define p (interpret (preprocess (deserialize normalized) var rel fun)))
 
 ;; normalized (g R)
 (define (ng w) (op-sum w (op-* w (op-I (op-rel R (list x y w))))))

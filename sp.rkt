@@ -26,8 +26,10 @@
 (define (g S x z)
   `(sum w (* ,(S x z 'w) w)))
 
+(define expr (serialize (g (curry f r) 'x 'z) rel var fun))
+
 (define o (open-output-file #:exists 'replace "/home/remywang/projects/pier/temp"))
-(write (serialize (g (curry f r) 'x 'z) rel var fun) o)
+(write expr o)
 (close-output-port o)
 
 (define semiring-out (string-join (string-split (with-output-to-string (λ() (system "/home/remywang/projects/semiring/target/release/semiring < /home/remywang/projects/pier/temp"))) "\n")))

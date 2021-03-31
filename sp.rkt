@@ -11,7 +11,8 @@
   (sum w (* w (I (E x z w)))))
 
 ;; TODO infer base rel automatically
-(define (r x y z) `(R ,x ,y ,z))
+;; TODO change to (I (R x y z))
+(define (base x y z) `(R ,x ,y ,z))
 
 ;; TODO insert quotes automatically
 ;; interpret arguments, symbolize others
@@ -27,7 +28,7 @@
   `(sum w (* ,(S x z 'w) w)))
 
 ;; g(f(R))(x,z)
-(define p (g (curry f r) 'x 'z))
+(define p (g (curry f base) 'x 'z))
 
 (define (normalize p)
   (define in (serialize p rel var fun))
@@ -38,9 +39,9 @@
               (system* semiring)))))
   (read (open-input-string (string-normalize-spaces out))))
 
-(define spec (interpret (preprocess (deserialize (normalize p)) var rel fun)))
+(define prog (interpret (preprocess (deserialize (normalize p)) var rel fun)))
 
 ;; normalized (g R)
-(define (g-normal w) (op-sum w (op-* w (op-I (op-rel R (list x y w))))))
+(define (g-R w) (op-sum w (op-* w (op-I (op-rel R (list x y w))))))
 
-(optimize spec g-normal)
+(optimize prog g-R)

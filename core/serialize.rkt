@@ -19,3 +19,5 @@
     [`(sum ,v ,b) `(sum ,v ,(deserialize b))]
     [`(,f ,es ...) `(,f ,@(map deserialize es))]
     [n n]))
+
+(define semiring "/home/remywang/projects/semiring/target/release/semiring")

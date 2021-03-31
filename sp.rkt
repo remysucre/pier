@@ -26,19 +26,21 @@
 (define (g S x z)
   `(sum w (* ,(S x z 'w) w)))
 
-(define expr (serialize (g (curry f r) 'x 'z) rel var fun))
+;; g(f(R))(x,z)
+(define p (g (curry f r) 'x 'z))
 
-(define o (open-output-file #:exists 'replace "/home/remywang/projects/pier/temp"))
-(write expr o)
-(close-output-port o)
+(define (normalize p)
+  (define in (serialize p rel var fun))
+  (define out
+    (with-output-to-string
+      (λ () (parameterize
+              ([current-input-port (open-input-string (~s in))])
+              (system* semiring)))))
+  (read (open-input-string (string-normalize-spaces out))))
 
-(define semiring-out (string-join (string-split (with-output-to-string (λ() (system "/home/remywang/projects/semiring/target/release/semiring < /home/remywang/projects/pier/temp"))) "\n")))
-
-(define normalized (read (open-input-string semiring-out)))
-
-(define p (interpret (preprocess (deserialize normalized) var rel fun)))
+(define spec (interpret (preprocess (deserialize (normalize p)) var rel fun)))
 
 ;; normalized (g R)
-(define (ng w) (op-sum w (op-* w (op-I (op-rel R (list x y w))))))
+(define (g-normal w) (op-sum w (op-* w (op-I (op-rel R (list x y w))))))
 
-(optimize p ng)
+(optimize spec g-normal)

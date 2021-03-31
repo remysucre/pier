@@ -27,6 +27,9 @@
 (define (g S x z)
   `(sum w (* ,(S x z 'w) w)))
 
+(define (g-fun w S x z)
+  (op-sum w (op-* (S x z w) w)))
+
 ;; g(f(R))(x,z)
 (define p (g (curry f base) 'x 'z))
 
@@ -42,6 +45,10 @@
 (define prog (interpret (preprocess (deserialize (normalize p)) var rel fun)))
 
 ;; normalized (g R)
-(define (g-R w) (op-sum w (op-* w (op-I (op-rel R (list x y w))))))
+(define (g-R x y w)
+  (op-sum w (op-* w (op-I (op-rel R (list x y w))))))
+#;(define (g-R w)
+  (g-fun w (lambda (x z w) (op-I (op-rel R (list x z w)))) x y)
+  #;(op-sum w (op-* w (op-I (op-rel R (list x y w))))))
 
 (optimize prog g-R)

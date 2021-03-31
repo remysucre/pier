@@ -55,7 +55,7 @@
                             (??agg 0
                                    (op-* e (??factor 1))))))]))
   (define (sketch g)
-    (match (g (apply choose* ws))
+    (match (g (??v) (??v) (apply choose* ws))
       [(op-sum w e)
        (op-+ (??term 0)
              (??agg 1

@@ -21,3 +21,12 @@
     [n n]))
 
 (define semiring "/home/remywang/projects/semiring/target/release/semiring")
+
+(define (normalize p var rel fun)
+  (define in (serialize p rel var fun))
+  (define out
+    (with-output-to-string
+      (λ () (parameterize
+              ([current-input-port (open-input-string (~s in))])
+              (system* semiring)))))
+  (deserialize (read (open-input-string (string-normalize-spaces out)))))

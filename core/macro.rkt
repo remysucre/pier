@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "interpret.rkt" "grammar.rkt" "ops.rkt")
+(require "interpret.rkt" "grammar.rkt" "ops.rkt" "process.rkt" "serialize.rkt")
 
 (define id? integer?)
 (define int? integer?)
@@ -56,11 +56,12 @@
             [(cons o xs) (if (eq? o 'r)
                              (apply r (map punctuate xs))
                              (cons o (map punctuate xs)))]))
-        (punctuate 'e))))))
+        (punctuate 'e))))
+    (hash-set! meta 'f fun)))
 
-(define-syntax-rule (ret (g s) (λ (x ...) e))
+(define-syntax-rule (ret (fun s) (λ (x ...) e))
   (begin
-    (define (g s)
+    (define (fun s)
       (λ (x ...)
         (begin
           (define args (make-hash (list (cons 'x x) ...)))
@@ -72,15 +73,34 @@
                                (cons o (map punctuate xs)))])
             )
           (punctuate 'e))))
+    (hash-set! meta 'g fun)
     (hash-set! meta 'g-args (list 'x ...))))
 
-(define (optimize p g)
+(define (optimize)
+  (define prog
+    (let* ([g (hash-ref meta 'g)]
+           [f (hash-ref meta 'f)]
+           [r (hash-ref meta 'base)]
+           [xs (hash-ref meta 'g-args)]
+           [norm (λ (p) (normalize p var rel fun))]
+           [prep (λ (p) (preprocess p var rel fun))]
+           [p (apply (g (f r)) xs)])
+      (interpret (prep (deserialize (norm p))))))
+
+  (define (g-R x z w) ; all variables in g
+    (define vs (hash 'x x 'z z 'w w))
+    (define g (hash-ref meta 'g))
+    (define (r x y z) `(I (R ,x ,y ,z)))
+    (define (norm p) (normalize p var rel fun))
+    (define (prep p) (preprocess p vs rel fun))
+    (prep (norm ((g r) 'x 'z))))
+
   (define sketch (gen-grammar type->var
                               type->rel
                               fun->type
                               #;(list op-+ op-*)
                               (list op-+ op-* op-/)
-                              g))
+                              g-R))
 
   (define M
     (synthesize
@@ -88,6 +108,7 @@
                       (hash-values var)
                       (hash-values fun)
                       (list sum inv))
-     #:guarantee (assert (eq? (interpret sketch) p))))
+     #:guarantee (assert (eq? (interpret sketch) prog))))
 
-  (evaluate sketch M))
+  (define h-g (evaluate sketch M))
+  (display (postprocess h-g var->symbol rel->symbol fun->symbol)))

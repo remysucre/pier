@@ -19,12 +19,12 @@
 (define (f R)
   (lambda (x z w)
     `(+ (I (E ,x ,z ,w))
-      (sum y
-           (sum w1
-                (sum w2
-                     (* (* (I ,(R x 'y 'w1))
-                           (I (E y ,z w2)))
-                        (I (= ,w (* w1 w2))))))))))
+        (sum y
+             (sum w1
+                  (sum w2
+                       (* (* (I ,(R x 'y 'w1))
+                             (I (E y ,z w2)))
+                          (I (= ,w (* w1 w2))))))))))
 
 ;; g(S)(x,z)
 (define (g S)
@@ -45,7 +45,7 @@
 (define prog (interpret (preprocess (deserialize (normalize p)) var rel fun)))
 
 ;; normalized (g R)
-(define (g-R x z w)
+(define (g-R x z w) ; all variables in g
   (define vs (hash 'x x 'z z 'w w))
   (define (r x y z) `(I (R ,x ,y ,z)))
   (preprocess (deserialize (normalize ((g r) 'x 'z))) vs rel fun))

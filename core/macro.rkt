@@ -41,6 +41,19 @@
          (hash-set! fun->symbol f 'f)
          (hash-set! fun->type f (list (hash-ref var->type x) ...))))
 
+(define-syntax-rule (strat (fun r) (λ (x ...) e))
+  (define (fun r)
+    (λ (x ...)
+      (begin
+        (define args (make-hash (list (cons 'x x) ...)))
+        (define (punctuate p)
+          (match p
+            [(? symbol?) (hash-ref args p p)]
+            [(cons o xs) (if (eq? o r)
+                             (apply o (map punctuate xs))
+                             (cons o (map punctuate xs)))]))
+        (punctuate 'e)))))
+
 (define (optimize p g)
   (define sketch (gen-grammar type->var
                               type->rel

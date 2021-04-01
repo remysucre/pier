@@ -13,22 +13,19 @@
 ;; TODO infer base rel automatically
 (define (base x y w) `(R ,x ,y ,w))
 
-;; TODO insert quotes automatically
-;; interpret arguments, symbolize others
-;; f(R)(x,y,w)
-(define (f R)
-  (lambda (x z w)
-    `(+ (I (E ,x ,z ,w))
-        (sum y
-             (sum w1
-                  (sum w2
-                       (* (* (I ,(R x 'y 'w1))
-                             (I (E y ,z w2)))
-                          (I (= ,w (* w1 w2))))))))))
+(strat (f R)
+       (λ (x z w)
+         (+ (I (E x z w))
+            (sum y
+                 (sum w1
+                      (sum w2
+                           (* (* (I (R x y w1))
+                                 (I (E y z w2)))
+                              (I (= w (* w1 w2))))))))))
 
 ;; g(S)(x,z)
 (define (g S)
-  (lambda (x z) `(sum w (* ,(S x z 'w) w))))
+  (λ (x z) `(sum w (* ,(S x z 'w) w))))
 
 ;; g(f(R))(x,z)
 (define p ((g (f base)) 'x 'z))

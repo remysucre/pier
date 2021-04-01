@@ -11,26 +11,27 @@
   (sum w (* w (I (E x z w)))))
 
 ;; TODO infer base rel automatically
-(define (base x y z) `(R ,x ,y ,z))
+(define (base x y w) `(R ,x ,y ,w))
 
 ;; TODO insert quotes automatically
 ;; interpret arguments, symbolize others
 ;; f(R)(x,y,w)
-(define (f r x z w)
-  `(+ (I (E ,x ,z ,w))
+(define (f R)
+  (lambda (x z w)
+    `(+ (I (E ,x ,z ,w))
       (sum y
            (sum w1
                 (sum w2
-                     (* (* (I ,(r x 'y 'w1))
+                     (* (* (I ,(R x 'y 'w1))
                            (I (E y ,z w2)))
-                        (I (= ,w (* w1 w2)))))))))
+                        (I (= ,w (* w1 w2))))))))))
 
 ;; g(S)(x,z)
-(define (g S x z)
-  `(sum w (* ,(S x z 'w) w)))
+(define (g S)
+  (lambda (x z) `(sum w (* ,(S x z 'w) w))))
 
 ;; g(f(R))(x,z)
-(define p (g (curry f base) 'x 'z))
+(define p ((g (f base)) 'x 'z))
 
 (define (normalize p)
   (define in (serialize p rel var fun))
@@ -47,6 +48,6 @@
 (define (g-R x z w)
   (define vs (hash 'x x 'z z 'w w))
   (define (r x y z) `(I (R ,x ,y ,z)))
-  (preprocess (deserialize (normalize (g r 'x 'z))) vs rel fun))
+  (preprocess (deserialize (normalize ((g r) 'x 'z))) vs rel fun))
 
 (postprocess (optimize prog g-R) var->symbol rel->symbol fun->symbol)

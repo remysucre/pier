@@ -11,6 +11,9 @@
 (define rel (make-hash)) ;; symbol->rel
 (define var (make-hash)) ;; symbol->var
 (define fun (make-hash)) ;; symbol->fun
+(define var->symbol (make-hash)) ;; symbol->var
+(define fun->symbol (make-hash)) ;; symbol->var
+(define rel->symbol (make-hash)) ;; symbol->var
 
 (define type->var (make-hash))
 (define type->rel (make-hash))
@@ -25,13 +28,17 @@
     (define-symbolic x ... type)
     (hash-set! kind 'x x) ...
     (match 'kind
-      ['var (begin (hash-set! type->var 'type (list x ...))
+      ['var (begin (hash-set! var->symbol x 'x) ...
+                   (hash-set! type->var 'type (list x ...))
                    (hash-set! var->type x 'type) ... )]
-      ['rel (hash-set! type->rel (types 'type) (list x ...))])))
+      ['rel (begin
+              (hash-set! rel->symbol x 'x) ...
+              (hash-set! type->rel (types 'type) (list x ...)))])))
 
 (define-syntax-rule (def (f x ...) e)
   (begin (define (f x ...) e)
          (hash-set! fun 'f f)
+         (hash-set! fun->symbol f 'f)
          (hash-set! fun->type f (list (hash-ref var->type x) ...))))
 
 (define (optimize p g)

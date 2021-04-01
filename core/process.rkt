@@ -1,6 +1,7 @@
 #lang rosette
 
 (require "ops.rkt")
+(require rosette/lib/destruct)
 
 (provide (all-defined-out))
 
@@ -17,3 +18,17 @@
       [`(,f ,vs ...) (apply (hash-ref rel f (lambda () (hash-ref fun f)))
                             (map prep vs))]))
   (prep e))
+
+;; struct to sexp
+(define (postprocess e var rel fun)
+  (define (post e)
+    (match e
+      [(op-I e) `(I ,(post e))]
+      [(op-inv e) `(inv ,(post e))]
+      [(op-* x y) `(* ,(post x) ,(post y))]
+      [(op-+ x y) `(+ ,(post x) ,(post y))]
+      [(op-sum v b) `(sum ,(post v) ,(post b))]
+      [(op f es) `(,(hash-ref fun f) ,@(map post es))]
+      [(expression _ r es ...) `(,(hash-ref rel r) ,@(map post es))]
+      [x (hash-ref var x x)]))
+  (post e))

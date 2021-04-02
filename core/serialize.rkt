@@ -12,6 +12,15 @@
       [n n]))
   (ser e))
 
+(define (make-pattern e)
+  (define (mark s)
+    (string->symbol (string-append "?" (symbol->string s))))
+  (match e
+    [`(var ,x) `(var ,(mark x))]
+    [`(sum ,v ,b) `(sum ,(mark v) ,(make-pattern b))]
+    [`(,o ,xs ...) `(,o ,@(map make-pattern xs))]
+    [_ e]))
+
 (define (deserialize e)
   (match e
     [`(var ,x) x]
@@ -29,4 +38,12 @@
       (λ () (parameterize
               ([current-input-port (open-input-string (~s in))])
               (system* semiring)))))
+  (deserialize (read (open-input-string (string-normalize-spaces out)))))
+
+(define (extract rw e)
+  (define out
+    (with-output-to-string
+      (λ () (parameterize
+              ([current-input-port (open-input-string (~s e))])
+              (system* semiring "extract" rw)))))
   (deserialize (read (open-input-string (string-normalize-spaces out)))))

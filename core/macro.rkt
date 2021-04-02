@@ -95,6 +95,19 @@
     (define (prep p) (preprocess p vs rel fun))
     (prep (norm ((g r) 'x 'z))))
 
+  (define (g-n)
+    (define g (hash-ref meta 'g))
+    (define (r x y z) `(I (R ,x ,y ,z)))
+    (define (norm p) (normalize p var rel fun))
+    (norm ((g r) 'x 'z)))
+
+  (define rewrite
+    (string-append (pretty-format (make-pattern (serialize (g-n) rel var fun)) 'infinity #:mode 'display)
+                   " => "
+                   (pretty-format `(S ,@(map (λ (x) `(var ,(string->symbol (string-append "?" (symbol->string x))))) (hash-ref meta 'g-args)))
+                                  'infinity
+                                  #:mode 'display)))
+
   (define sketch (gen-grammar type->var
                               type->rel
                               fun->type
@@ -111,4 +124,5 @@
      #:guarantee (assert (eq? (interpret sketch) prog))))
 
   (define h-g (evaluate sketch M))
-  (display (postprocess h-g var->symbol rel->symbol fun->symbol)))
+  (define hg (serialize (postprocess h-g var->symbol rel->symbol fun->symbol) rel var fun))
+  (display (extract rewrite hg)))

@@ -63,5 +63,9 @@
                     (op-sum w
                             (??agg 0
                                    (op-* e (??factor 0)))))))]))
+  #;(define (sketch g)
+    (match (g (??v))
+      [e (op-+ (??term 0)
+               (??agg 1 (op-* e (??factor 0))))]))
 
   (sketch g))

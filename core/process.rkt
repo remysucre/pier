@@ -16,7 +16,8 @@
       [`(+ ,x ,y) (op-+ (prep x) (prep y))]
       [`(sum ,y ,e) (op-sum (hash-ref var y) (prep e))]
       [`(,f ,vs ...) (apply (hash-ref rel f (lambda () (hash-ref fun f)))
-                            (map prep vs))]))
+                            (map prep vs))]
+      [_ e]))
   (prep e))
 
 ;; struct to sexp
@@ -29,6 +30,7 @@
       [(op-+ x y) `(+ ,(post x) ,(post y))]
       [(op-sum v b) `(sum ,(post v) ,(post b))]
       [(op f es) `(,(hash-ref fun f) ,@(map post es))]
-      [(expression _ r es ...) `(,(hash-ref rel r) ,@(map post es))]
+      [(op-rel r es)`(,(hash-ref rel r) ,@(map post es))]
+      [(expression _ r es ...)`(,(hash-ref rel r) ,@(map post es))]
       [x (hash-ref var x x)]))
   (post e))

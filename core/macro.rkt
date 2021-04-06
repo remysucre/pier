@@ -71,7 +71,8 @@
               [(? symbol?) (hash-ref args p p)]
               [(cons o xs) (if (eq? o 's)
                                (apply s (map punctuate xs))
-                               (cons o (map punctuate xs)))])
+                               (cons o (map punctuate xs)))]
+              [_ p])
             )
           (punctuate 'e))))
     (hash-set! meta 'g fun)
@@ -88,6 +89,14 @@
            [p (apply (g (f r)) xs)])
       (interpret (prep (deserialize (norm p))))))
 
+  #;(define (g-R y) ; all variables in g
+    (define vs (hash 'y y))
+    (define g (hash-ref meta 'g))
+    (define (r x y) `(I (R ,x ,y)))
+    (define (norm p) (normalize p var rel fun))
+    (define (prep p) (preprocess p vs rel fun))
+    (prep (norm ((g r) 'y))))
+
   (define (g-R x z w) ; all variables in g
     (define vs (hash 'x x 'z z 'w w))
     (define g (hash-ref meta 'g))
@@ -96,6 +105,11 @@
     (define (prep p) (preprocess p vs rel fun))
     (prep (norm ((g r) 'x 'z))))
 
+  #;(define (g-n)
+    (define g (hash-ref meta 'g))
+    (define (r x y) `(I (R ,x ,y)))
+    (define (norm p) (normalize p var rel fun))
+    (norm ((g r) 'y)))
   (define (g-n)
     (define g (hash-ref meta 'g))
     (define (r x y z) `(I (R ,x ,y ,z)))
@@ -103,7 +117,7 @@
     (norm ((g r) 'x 'z)))
 
   (define (rewrite)
-    (define (? x) `(var ,(string->symbol (~s '? x))))
+    (define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))
     (define xs (hash-ref meta 'g-args))
     (define lhs (make-pattern (serialize (g-n) rel var fun)))
     (~s lhs `(S ,@(map ? xs)) #:separator " => "))

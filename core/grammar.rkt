@@ -31,7 +31,7 @@
 
   (define (??factor depth)
     (if (= 0 depth)
-        (apply choose* (append ws (??rel) (??fun)))
+        (apply choose* (append ws (??rel) (??fun) (list 0)))
         ((??o) (??factor (- depth 1)) (??factor (- depth 1)))))
 
   (define (??term depth)
@@ -57,10 +57,11 @@
   (define (sketch g)
     (match (g (??v) (??v) (apply choose* ws))
       [(op-sum w e)
-       (op-+ (??term 0)
+       (op-+ (op-sum w (op-* e (??factor 0)))
+             (op-+ (??term 0)
              (??agg 1
                     (op-sum w
                             (??agg 0
-                                   (op-* e (??factor 0))))))]))
+                                   (op-* e (??factor 0)))))))]))
 
   (sketch g))

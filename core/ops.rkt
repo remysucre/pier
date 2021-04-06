@@ -28,3 +28,6 @@
 
 (define (I b) (if b 1 0))
 (define (div x y) (* x (inv y)))
+
+(define-symbolic temp integer?)
+(assert (forall (list temp) (= (sum temp 0) 0)))

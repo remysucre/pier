@@ -11,9 +11,9 @@
 (define rel (make-hash)) ;; symbol->rel
 (define var (make-hash)) ;; symbol->var
 (define fun (make-hash)) ;; symbol->fun
-(define var->symbol (make-hash)) ;; symbol->var
-(define fun->symbol (make-hash)) ;; symbol->var
-(define rel->symbol (make-hash)) ;; symbol->var
+(define var->symbol (make-hash))
+(define fun->symbol (make-hash))
+(define rel->symbol (make-hash))
 
 (define type->var (make-hash))
 (define type->rel (make-hash))
@@ -28,6 +28,7 @@
 (define-syntax-rule (decl kind x ... type)
   (begin
     (define-symbolic x ... type)
+    ;; setting rel, var, fun
     (hash-set! kind 'x x) ...
     (match 'kind
       ['var (begin (hash-set! var->symbol x 'x) ...
@@ -101,19 +102,17 @@
     (define (norm p) (normalize p var rel fun))
     (norm ((g r) 'x 'z)))
 
-  (define rewrite
-    (string-append (pretty-format (make-pattern (serialize (g-n) rel var fun)) 'infinity #:mode 'display)
-                   " => "
-                   (pretty-format `(S ,@(map (λ (x) `(var ,(string->symbol (string-append "?" (symbol->string x))))) (hash-ref meta 'g-args)))
-                                  'infinity
-                                  #:mode 'display)))
+  (define (rewrite)
+    (define (? x) `(var ,(string->symbol (~s '? x))))
+    (define xs (hash-ref meta 'g-args))
+    (define lhs (make-pattern (serialize (g-n) rel var fun)))
+    (~s lhs `(S ,@(map ? xs)) #:separator " => "))
 
-  (define sketch (gen-grammar type->var
-                              type->rel
-                              fun->type
-                              #;(list op-+ op-*)
-                              (list op-+ op-* op-/)
-                              g-R))
+  (define sketch
+    (gen-grammar type->var type->rel fun->type
+                 #;(list op-+ op-*)
+                 (list op-+ op-* op-/)
+                 g-R))
 
   (define M
     (synthesize
@@ -125,4 +124,4 @@
 
   (define h-g (evaluate sketch M))
   (define hg (serialize (postprocess h-g var->symbol rel->symbol fun->symbol) rel var fun))
-  (display (extract rewrite hg)))
+  (display (extract (rewrite) hg)))

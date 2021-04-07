@@ -14,9 +14,12 @@
       [`(inv ,e) (op-inv (prep e))]
       [`(* ,x ,y) (op-* (prep x) (prep y))]
       [`(+ ,x ,y) (op-+ (prep x) (prep y))]
+      [`(- ,x ,y) (op-- (prep x) (prep y))]
+      [`(= ,x ,y) (op-eq? (prep x) (prep y))]
+      [`(<= ,x ,y) (op-leq (prep x) (prep y))]
       [`(sum ,y ,e) (op-sum (hash-ref var y) (prep e))]
-      [`(,f ,vs ...) (apply (hash-ref rel f (lambda () (hash-ref fun f)))
-                            (map prep vs))]
+      [`(,f ,vs ...) (cond [(hash-has-key? rel f) (op-rel (hash-ref rel f) (map prep vs))]
+                           [else (op (hash-ref fun f) (map prep vs))])]
       [_ e]))
   (prep e))
 
@@ -28,6 +31,9 @@
       [(op-inv e) `(inv ,(post e))]
       [(op-* x y) `(* ,(post x) ,(post y))]
       [(op-+ x y) `(+ ,(post x) ,(post y))]
+      [(op-- x y) `(- ,(post x) ,(post y))]
+      [(op-eq? x y) `(= ,(post x) ,(post y))]
+      [(op-leq x y) `(<= ,(post x) ,(post y))]
       [(op-sum v b) `(sum ,(post v) ,(post b))]
       [(op f es) `(,(hash-ref fun f) ,@(map post es))]
       [(op-rel r es)`(,(hash-ref rel r) ,@(map post es))]

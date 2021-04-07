@@ -31,7 +31,7 @@
 
   (define (??factor depth)
     (if (= 0 depth)
-        (apply choose* (append ws (??rel) (??fun) (list 0)))
+        (apply choose* (append ws (??rel) (??fun) (list 0 1)))
         ((??o) (??factor (- depth 1)) (??factor (- depth 1)))))
 
   (define (??term depth)
@@ -46,6 +46,7 @@
       (op-sum (??v) (??agg (- depth 1) e))))
 
   ;; FIXME only 1 level of aggregate
+  ;; bc
   #;(define (sketch g)
     (match g
       [(op-sum w e)
@@ -54,7 +55,18 @@
                     (op-sum w
                             (??agg 0
                                    (op-* e (??factor 1))))))]))
+
+  ;; rt
   (define (sketch g)
+    (match (g (??v) (??v) (??v))
+      [(op-sum j (op-sum w e))
+       (op-+ (??term 0)
+             (op-sum j
+                     (op-sum w
+                             (op-* e (??factor 0)))))]))
+
+  ;; sp
+  #;(define (sketch g)
     (match (g (??v) (??v) (apply choose* ws))
       [(op-sum w e)
        (op-+ (op-sum w (op-* e (??factor 0)))
@@ -63,6 +75,7 @@
                     (op-sum w
                             (??agg 0
                                    (op-* e (??factor 0)))))))]))
+  ;; tc
   #;(define (sketch g)
     (match (g (??v))
       [e (op-+ (??term 0)

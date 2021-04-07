@@ -91,7 +91,7 @@
       (interpret (prep (deserialize (norm p))))))
 
   ;; tc
-  #;(define (g-R y) ; all variables in g
+  (define (g-R y) ; all variables in g
     (define vs (hash 'y y))
     (define g (hash-ref meta 'g))
     (define (r x y) `(I (R ,x ,y)))
@@ -109,7 +109,7 @@
     (prep (norm ((g r) 'x 'z))))
 
   ;; rt
-  (define (g-R t j w) ; all variables in g
+  #;(define (g-R t j w) ; all variables in g
     (define vs (hash 't t 'j j 'w w))
     (define g (hash-ref meta 'g))
     (define (r t j w) `(I (R ,t ,j ,w)))
@@ -118,7 +118,7 @@
     (prep (norm ((g r) 't))))
 
   ;; tc
-  #;(define (g-n)
+  (define (g-n)
     (define g (hash-ref meta 'g))
     (define (r x y) `(I (R ,x ,y)))
     (define (norm p) (normalize p var rel fun))
@@ -132,7 +132,7 @@
     (norm ((g r) 'x 'z)))
 
   ;; rt
-  (define (g-n)
+  #;(define (g-n)
     (define g (hash-ref meta 'g))
     (define (r t j w) `(I (R ,t ,j ,w)))
     (define (norm p) (normalize p var rel fun))

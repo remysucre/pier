@@ -32,3 +32,5 @@
 (hash-update! type->var 'int? (curry cons (op-- t 1)))
 
 (optimize)
+
+;; (+ (vec-get j w t) (S (- t 1)))

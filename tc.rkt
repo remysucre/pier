@@ -16,3 +16,5 @@
 (hash-update! type->var 'id? (curry cons 1))
 
 (optimize)
+
+;; (+ (I (E 1 y)) (sum z (* (S z) (I (E z y)))))

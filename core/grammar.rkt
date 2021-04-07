@@ -57,7 +57,7 @@
                                    (op-* e (??factor 1))))))]))
 
   ;; rt
-  (define (sketch g)
+  #;(define (sketch g)
     (match (g (??v) (??v) (??v))
       [(op-sum j (op-sum w e))
        (op-+ (??term 0)
@@ -76,7 +76,7 @@
                             (??agg 0
                                    (op-* e (??factor 0)))))))]))
   ;; tc
-  #;(define (sketch g)
+  (define (sketch g)
     (match (g (??v))
       [e (op-+ (??term 0)
                (??agg 1 (op-* e (??factor 0))))]))

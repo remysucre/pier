@@ -26,3 +26,5 @@
   (λ (x z) (sum w (* (R x z w) w))))
 
 (optimize)
+
+;; (+ (weight w x z) (* (S x y) (sum y (weight w2 y z))))

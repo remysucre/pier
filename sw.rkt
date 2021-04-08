@@ -1,4 +1,4 @@
-lang rosette
+#lang rosette
 (require "core/lib.rkt")
 
 (decl rel R (~> int? int? int? bool?))
@@ -35,9 +35,5 @@ lang rosette
 
 (hash-update! type->var 'int? (curry cons (op-- t 1)))
 (hash-update! type->var 'int? (curry cons (op-- t k)))
-(hash-update! type->var 'int? (curry cons (op vec-get (list j w (- t k)))))
-(hash-update! type->var 'int? (curry cons (op vec-get (list j w t))))
-
-;; type->var
 
 (optimize)

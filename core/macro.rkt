@@ -180,7 +180,10 @@
                       (list sum inv))
      #:guarantee (assert (eq? (interpret sketch) prog))))
 
-  (define h-g (evaluate sketch M))
-  (display h-g)
-  (define hg (serialize (postprocess h-g var->symbol rel->symbol fun->symbol) rel var fun))
+  (define hg (serialize (postprocess (evaluate sketch M)
+                                     var->symbol
+                                     rel->symbol
+                                     fun->symbol)
+                        rel var fun))
+
   (display (extract (rewrite) hg)))

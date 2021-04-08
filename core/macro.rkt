@@ -88,7 +88,6 @@
            [norm (λ (p) (normalize p var rel fun))]
            [prep (λ (p) (preprocess p var rel fun))]
            [p (apply (g (f r)) xs)])
-      #;(display (deserialize (norm p)))
       (interpret (prep (deserialize (norm p))))))
 
   ;; tc
@@ -125,10 +124,7 @@
     (define (r t j w) `(I (R ,t ,j ,w)))
     (define (norm p) (normalize p var rel fun))
     (define (prep p) (preprocess p vs rel fun))
-    #;(display (norm ((g r) '(- t 1) 'k)))
     (prep (norm ((g r) 't 'k))))
-
-  #;(render-value/window (g-R 't 'j 'w 'k))
 
   ;; tc
   #;(define (g-n)

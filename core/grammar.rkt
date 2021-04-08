@@ -66,7 +66,7 @@
                              (op-* e (??factor 0)))))]))
 
   ;; sp
-  #;(define (sketch g)
+  (define (sketch g)
     (match (g (??v) (??v) (apply choose* ws))
       [(op-sum w e)
        (op-+ (op-sum w (op-* e (??factor 0)))
@@ -82,7 +82,7 @@
                (??agg 1 (op-* e (??factor 0))))]))
 
   ;; sw
-  (define (sketch g)
+  #;(define (sketch g)
     (op-+ (op-- (??term 0) (??term 0))
           (g (??v) (??v) (??v) (??v))))
 

@@ -88,7 +88,7 @@
            [norm (λ (p) (normalize p var rel fun))]
            [prep (λ (p) (preprocess p var rel fun))]
            [p (apply (g (f r)) xs)])
-      (display (deserialize (norm p)))
+      #;(display (deserialize (norm p)))
       (interpret (prep (deserialize (norm p))))))
 
   ;; tc
@@ -126,7 +126,7 @@
     (define (norm p) (normalize p var rel fun))
     (define (prep p) (preprocess p vs rel fun))
     #;(display (norm ((g r) '(- t 1) 'k)))
-    (prep (norm ((g r) '(- t 1) 'k))))
+    (prep (norm ((g r) 't 'k))))
 
   #;(render-value/window (g-R 't 'j 'w 'k))
 
@@ -181,5 +181,6 @@
      #:guarantee (assert (eq? (interpret sketch) prog))))
 
   (define h-g (evaluate sketch M))
+  (display h-g)
   (define hg (serialize (postprocess h-g var->symbol rel->symbol fun->symbol) rel var fun))
   (display (extract (rewrite) hg)))

@@ -23,6 +23,6 @@
     ;; relations
     [(op-rel r xs) (apply r (map interpret xs))]
     ;; UDF
-    [(op f xs) (apply f xs)]
+    [(op f xs) (apply f (map interpret xs))]
     ;; variables and constants
     [p p]))

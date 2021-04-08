@@ -9,33 +9,25 @@
 ;; INPUT
 ;;
 (define prog
-(op--
- (op-+
-  (op-sum-i-i
-   'j
-   (op-sum-i-i 'w (op-* (op-* 'w (op-* (op-I-BN (op-leq 1 'j)) (op-I-BN (op-leq 'j 't)))) (op-* (op-I-BN (op-eq? 'j 't)) (op-I-BN (rel-v 'j 'w))))))
-  (op-sum-i-i
-   'j
-   (op-sum-i-i
-    'w
-    (op-*
-     (op-* 'w (op-* (op-I-BN (op-leq 1 'j)) (op-I-BN (op-leq 'j 't))))
-     (op-* (op-I-BN (rel-R (op-- 't 1) 'j 'w)) (op-* (op-I-BN (op-lt 'j 't)) (op-I-BN (op-gt 't 1))))))))
- (op-+
-  (op-sum-i-i
-   'j
-   (op-sum-i-i
-    'w
-    (op-*
-     (op-* 'w (op-* (op-I-BN (op-leq 1 'j)) (op-I-BN (op-leq 'j (op-- 't 'k)))))
-     (op-* (op-I-BN (rel-v 'j 'w)) (op-I-BN (op-eq? 'j (op-- 't 'k)))))))
-  (op-sum-i-i
-   'j
-   (op-sum-i-i
-    'w
-    (op-*
-     (op-* 'w (op-* (op-I-BN (op-leq 1 'j)) (op-I-BN (op-leq 'j (op-- 't 'k)))))
-     (op-* (op-I-BN (rel-R (op-- (op-- 't 'k) 1) 'j 'w)) (op-* (op-I-BN (op-lt 'j (op-- 't 'k))) (op-I-BN (op-gt (op-- 't 'k) 1))))))))))
+(-
+ (+
+  (sum 'j
+   (sum 'w (* (* 'w (* (I (leq 1 'j)) (I (leq 'j 't))))
+	      (* (I (eq? 'j 't)) (I (v 'j 'w))))))
+  (sum 'j
+   (sum 'w
+    (* (* 'w (* (I (leq 1 'j)) (I (leq 'j 't))))
+       (* (I (R (- 't 1) 'j 'w))
+	  (* (I (lt 'j 't)) (I (gt 't 1))))))))
+ (+ (sum 'j
+	 (sum 'w
+	      (* (* 'w (* (I (leq 1 'j)) (I (leq 'j (- 't 'k)))))
+		 (* (I (v 'j 'w)) (I (eq? 'j (- 't 'k)))))))
+  (sum 'j
+   (sum 'w
+    (* (* 'w (* (I (leq 1 'j)) (I (leq 'j (- 't 'k)))))
+       (* (I (R (- (- 't 'k) 1) 'j 'w))
+	  (* (I (lt 'j (- 't 'k))) (I (gt (- 't 'k) 1))))))))))
 
 (define (prefix t)
   (op-+ (op-sum-i-i 'j

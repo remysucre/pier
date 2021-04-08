@@ -76,9 +76,17 @@
                             (??agg 0
                                    (op-* e (??factor 0)))))))]))
   ;; tc
-  (define (sketch g)
+  #;(define (sketch g)
     (match (g (??v))
       [e (op-+ (??term 0)
                (??agg 1 (op-* e (??factor 0))))]))
+
+  ;; sw
+  (define (sketch g)
+    (op-+ (op-- (??term 0) (??term 0))
+          (g (??v) (??v) (??v) (??v)))
+    #;(match (g (choose* (??v) (op-- (??v) 1)) (??v) (??v) (??v))
+      [e (op-+ (op-- (??term 0) (??term 0))
+               e)]))
 
   (sketch g))

@@ -88,10 +88,11 @@
            [norm (λ (p) (normalize p var rel fun))]
            [prep (λ (p) (preprocess p var rel fun))]
            [p (apply (g (f r)) xs)])
+      (display (deserialize (norm p)))
       (interpret (prep (deserialize (norm p))))))
 
   ;; tc
-  (define (g-R y) ; all variables in g
+  #;(define (g-R y) ; all variables in g
     (define vs (hash 'y y))
     (define g (hash-ref meta 'g))
     (define (r x y) `(I (R ,x ,y)))
@@ -117,8 +118,20 @@
     (define (prep p) (preprocess p vs rel fun))
     (prep (norm ((g r) 't))))
 
+  ;; sw
+  (define (g-R t j w k) ; all variables in g
+    (define vs (hash 't t 'j j 'w w 'k k))
+    (define g (hash-ref meta 'g))
+    (define (r t j w) `(I (R ,t ,j ,w)))
+    (define (norm p) (normalize p var rel fun))
+    (define (prep p) (preprocess p vs rel fun))
+    #;(display (norm ((g r) '(- t 1) 'k)))
+    (prep (norm ((g r) '(- t 1) 'k))))
+
+  #;(render-value/window (g-R 't 'j 'w 'k))
+
   ;; tc
-  (define (g-n)
+  #;(define (g-n)
     (define g (hash-ref meta 'g))
     (define (r x y) `(I (R ,x ,y)))
     (define (norm p) (normalize p var rel fun))
@@ -138,6 +151,13 @@
     (define (norm p) (normalize p var rel fun))
     (norm ((g r) '?t)))
 
+  ;; sw
+  (define (g-n)
+    (define g (hash-ref meta 'g))
+    (define (r t j w) `(I (R ,t ,j ,w)))
+    (define (norm p) (normalize p var rel fun))
+    (norm ((g r) '?t 'k)))
+
   (define (rewrite)
     #;(define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))
     (define (? x) (string->symbol (~s '? x #:separator "")))
@@ -148,7 +168,8 @@
   (define sketch
     (gen-grammar type->var type->rel fun->type
                  #;(list op-+ op-*)
-                 (list op-+ op-* op-/)
+                 (list op-+ op-* op--)
+                 #;(list op-+ op-* op-/)
                  g-R))
 
   (define M

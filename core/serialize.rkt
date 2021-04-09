@@ -5,7 +5,7 @@
 (define (serialize e rel var fun)
   (define (ser e)
     (match e
-      [(? (curry hash-has-key? var) e) `(var ,e)]
+      [(? (curry hash-has-key? var) e) e]
       [`(sum ,v ,b) `(sum ,v ,(ser b))]
       [`(,f ,es ...) (cond [(hash-has-key? rel f) `(rel ,f ,@(map ser es))]
                            [else `(,f ,@(map ser es))])]
@@ -16,14 +16,13 @@
   (define (mark s)
     (string->symbol (string-append "?" (symbol->string s))))
   (match e
-    [`(var ,x) `(var ,(mark x))]
+    [(? symbol? e) (mark e)]
     [`(sum ,v ,b) `(sum ,(mark v) ,(make-pattern b))]
     [`(,o ,xs ...) `(,o ,@(map make-pattern xs))]
     [_ e]))
 
 (define (deserialize e)
   (match e
-    [`(var ,x) x]
     [`(rel ,r ,vs ...) `(,r ,@(map deserialize vs))]
     [`(sum ,v ,b) `(sum ,v ,(deserialize b))]
     [`(,f ,es ...) `(,f ,@(map deserialize es))]

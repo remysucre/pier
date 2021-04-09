@@ -157,9 +157,9 @@
     (norm (apply (g r) xs)))
 
   (define (rewrite)
-    (define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))
+    ;; (define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))
     ;; TODO need to remove var for sw
-    #;(define (? x) (string->symbol (~s '? x #:separator "")))
+    (define (? x) (string->symbol (~s '? x #:separator "")))
     (define xs (hash-ref meta 'g-args))
     (define lhs (make-pattern (serialize (g-n) rel var fun)))
     (~s lhs `(S ,@(map ? xs)) #:separator " => "))

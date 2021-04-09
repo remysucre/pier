@@ -139,9 +139,9 @@
   (define (g-R) ; all variables in g
     (define g (hash-ref meta 'g))
     (define r (hash-ref meta 'r))
+    (define xs (hash-ref meta 'g-args))
     (define (norm p) (normalize p var rel fun))
     (define (prep p) (preprocess p var rel fun))
-    (define xs (hash-ref meta 'g-args))
     (prep (norm (apply (g r) xs))))
 
   ;; "return" stratum
@@ -152,8 +152,9 @@
   (define (g-n)
     (define g (hash-ref meta 'g))
     (define r (hash-ref meta 'r))
+    (define xs (hash-ref meta 'g-args))
     (define (norm p) (normalize p var rel fun))
-    (norm ((g r) 'x 'z)))
+    (norm (apply (g r) xs)))
 
   (define (rewrite)
     (define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))

@@ -18,6 +18,7 @@
   (match e
     [(? symbol? e) (mark e)]
     [`(sum ,v ,b) `(sum ,(mark v) ,(make-pattern b))]
+    [`(rel ,r ,xs ...) `(rel ,r ,@(map make-pattern xs))]
     [`(,o ,xs ...) `(,o ,@(map make-pattern xs))]
     [_ e]))
 

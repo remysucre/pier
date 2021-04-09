@@ -4,10 +4,13 @@
 (decl rel E R (~> id? id? bool?))
 (decl var x y z id?)
 
+(define (r x y) `(I (R ,x ,y)))
+(hash-set! meta 'r r)
+
 (rec (f R)
      (λ (x y)
        (+ (I (E x y))
-          (sum z (* (I (R x z))
+          (sum z (* (R x z)
                     (I (E z y)))))))
 
 (ret (g R)

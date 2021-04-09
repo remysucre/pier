@@ -46,7 +46,6 @@
 
 (define-syntax-rule (rec (fun r) (λ (x ...) e))
   (begin
-    (hash-set! meta 'base (curry list 'r))
     (define (fun r)
     (λ (x ...)
       (begin
@@ -83,27 +82,12 @@
   (define prog
     (let* ([g (hash-ref meta 'g)]
            [f (hash-ref meta 'f)]
-           [r (hash-ref meta 'base)]
+           [r (hash-ref meta 'r)]
            [xs (hash-ref meta 'g-args)]
            [norm (λ (p) (normalize p var rel fun))]
            [prep (λ (p) (preprocess p var rel fun))]
            [p (apply (g (f r)) xs)])
       (interpret (prep (deserialize (norm p))))))
-
-  ;; sp
-  (define (g-R x z w) ; all variables in g
-    (define vs (hash 'x x 'z z 'w w))
-    (define g (hash-ref meta 'g))
-    (define (r x y z) `(I (R ,x ,y ,z)))
-    (define (norm p) (normalize p var rel fun))
-    (define (prep p) (preprocess p vs rel fun))
-    (prep (norm ((g r) 'x 'z))))
-
-  (define (g-n)
-    (define g (hash-ref meta 'g))
-    (define (r x y z) `(I (R ,x ,y ,z)))
-    (define (norm p) (normalize p var rel fun))
-    (norm ((g r) 'x 'z)))
 
   ;; rt
   ;; (define (g-R t j w) ; all variables in g
@@ -151,6 +135,26 @@
   ;;   (define (norm p) (normalize p var rel fun))
   ;;   (norm ((g r) 'y)))
 
+  ;; sp
+  (define (g-R) ; all variables in g
+    (define g (hash-ref meta 'g))
+    (define r (hash-ref meta 'r))
+    (define (norm p) (normalize p var rel fun))
+    (define (prep p) (preprocess p var rel fun))
+    (define xs (hash-ref meta 'g-args))
+    (prep (norm (apply (g r) xs))))
+
+  ;; "return" stratum
+  #;(ret (g R)
+         ;; S[x,z] = min w . R(x,z,w) + w.
+         (λ (x z) (sum w (* (R x z w) w))))
+
+  (define (g-n)
+    (define g (hash-ref meta 'g))
+    (define r (hash-ref meta 'r))
+    (define (norm p) (normalize p var rel fun))
+    (norm ((g r) 'x 'z)))
+
   (define (rewrite)
     (define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))
     ;; TODO need to remove var for sw
@@ -164,7 +168,7 @@
                  #;(list op-+ op-*)
                  (list op-+ op-* op--)
                  #;(list op-+ op-* op-/)
-                 g-R))
+                 (g-R)))
 
   (define M
     (synthesize

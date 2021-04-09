@@ -6,6 +6,9 @@
 (decl var x y z id?)
 (decl var w w1 w2 int?)
 
+(define (r x y w) `(I (R ,x ,y ,w)))
+(hash-set! meta 'r r)
+
 ;; define helper functions
 (def (weight w x z)
   ;; min w . 1_{E(x,z,w)} + w.
@@ -18,7 +21,7 @@
      (I (E x z w))
      ;; R(x,z,w) :- R(x,y,w1), E(y,x,w2), w=w1+w2.
      (sum y (sum w1 (sum w2
-       (* (* (I (R x y w1)) (I (E y z w2))) (I (= w (* w1 w2))))))))))
+       (* (* (R x y w1) (I (E y z w2))) (I (= w (* w1 w2))))))))))
 
 ;; "return" stratum
 (ret (g R)

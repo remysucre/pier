@@ -68,7 +68,7 @@
 (define (extract rw e) (semiring e "extract" rw))
 
 (define (optimize)
-  (define prog
+  (define g-f-r
     (let* ([f (car (hash-ref meta 'f))]
            [g (car (hash-ref meta 'g))]
            [xs (cdr (hash-ref meta 'g))]
@@ -82,12 +82,12 @@
            [xs (cdr (hash-ref meta 'g))])
       (normalize (apply (g r) xs))))
 
-  (define rewrite
+  (define g-r=>s
     (let ([xs (cdr (hash-ref meta 'g))]
           [lhs (make-pattern g-r)])
       (~a lhs `(S ,@(map make-pattern xs)) #:separator "=>")))
 
-  (define sketch
+  (define h-g-r
     (gen-grammar type->var type->rel fun->type
                  #;(list op-+ op-*)
                  (list op-+ op-* op--)
@@ -100,6 +100,6 @@
                       (hash-values symbol->var)
                       (hash-values symbol->fun)
                       (list sum inv))
-     #:guarantee (assert (eq? (interpret sketch) prog))))
+     #:guarantee (assert (eq? (interpret h-g-r) g-f-r))))
 
-  (extract rewrite (s->e (evaluate sketch M))))
+  (extract g-r=>s (s->e (evaluate h-g-r M))))

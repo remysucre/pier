@@ -44,7 +44,7 @@
     [(? symbol? e) (~a '? e)]
     [_ e]))
 
-(define semiring-path "/home/remywang/projects/semiring/target/release/semiring")
+(define semiring-path "../semiring/target/release/semiring")
 
 (define (semiring e . args)
   (define out

@@ -89,36 +89,6 @@
            [p (apply (g (f r)) xs)])
       (interpret (prep (deserialize (norm p))))))
 
-  ;; rt
-  ;; (define (g-R t j w) ; all variables in g
-  ;;   (define vs (hash 't t 'j j 'w w))
-  ;;   (define g (hash-ref meta 'g))
-  ;;   (define (r t j w) `(I (R ,t ,j ,w)))
-  ;;   (define (norm p) (normalize p var rel fun))
-  ;;   (define (prep p) (preprocess p vs rel fun))
-  ;;   (prep (norm ((g r) 't))))
-
-  ;; (define (g-n)
-  ;;   (define g (hash-ref meta 'g))
-  ;;   (define (r t j w) `(I (R ,t ,j ,w)))
-  ;;   (define (norm p) (normalize p var rel fun))
-  ;;   (norm ((g r) '?t)))
-
-  ;; sw
-  ;; (define (g-R t j w k) ; all variables in g
-  ;;   (define vs (hash 't t 'j j 'w w 'k k))
-  ;;   (define g (hash-ref meta 'g))
-  ;;   (define (r t j w) `(I (R ,t ,j ,w)))
-  ;;   (define (norm p) (normalize p var rel fun))
-  ;;   (define (prep p) (preprocess p vs rel fun))
-  ;;   (prep (norm ((g r) 't 'k))))
-
-  ;; (define (g-n)
-  ;;   (define g (hash-ref meta 'g))
-  ;;   (define (r t j w) `(I (R ,t ,j ,w)))
-  ;;   (define (norm p) (normalize p var rel fun))
-  ;;   (norm ((g r) '?t 'k)))
-
   (define (g-R)
     (define g (hash-ref meta 'g))
     (define r (hash-ref meta 'r))
@@ -137,10 +107,10 @@
   (define (rewrite)
     ;; (define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))
     ;; TODO need to remove var for sw
-    (define (? x) (string->symbol (~s '? x #:separator "")))
+    (define (? x) (~a '? x))
     (define xs (hash-ref meta 'g-args))
     (define lhs (make-pattern (serialize (g-n) rel var fun)))
-    (~s lhs `(S ,@(map ? xs)) #:separator " => "))
+    (~a lhs `(S ,@(map ? xs)) #:separator "=>"))
 
   (define sketch
     (gen-grammar type->var type->rel fun->type

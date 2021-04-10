@@ -13,8 +13,7 @@
   (ser e))
 
 (define (make-pattern e)
-  (define (mark s)
-    (string->symbol (string-append "?" (symbol->string s))))
+  (define (mark s) (~a '? s))
   (match e
     [(? symbol? e) (mark e)]
     [`(sum ,v ,b) `(sum ,(mark v) ,(make-pattern b))]

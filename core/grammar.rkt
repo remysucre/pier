@@ -88,7 +88,7 @@
       [_ g]))
 
   ;; rt
-  (define (sketch g)
+  #;(define (sketch g)
     (match g
       [(op-sum j (op-sum w e))
        (op-+ (??term 0)
@@ -105,8 +105,18 @@
       [_ g]))
 
   ;; sw
-  #;(define (sketch g)
+  (define (sketch g)
+    (define (sk g)
+      (match g
+        [(op-sum v e) (op-sum (hash-ref! env g (λ () (??v))) (sk e))]
+        [(op-* x y) (op-* (sk x) (sk y))]
+        [(op-- x y) (op-- (sk x) (sk y))]
+        [(op-leq x y) (op-leq (sk x) (sk y))]
+        [(op-rel R xs) (op-rel R (map sk xs))]
+        [(op-I r) (op-I (sk r))]
+        [(constant _ _) (hash-ref! env g (λ () (??v)))]
+        [_ g]))
     (op-+ (op-- (??term 0) (??term 0))
-          (g (??v) (??v) (??v) (??v))))
+          (sk g)))
 
   (sketch g))

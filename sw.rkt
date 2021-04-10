@@ -5,6 +5,9 @@
 (decl rel v (~> int? int? bool?))
 (decl var t j w k int?)
 
+(define (r x y w) `(I (R ,x ,y ,w)))
+(hash-set! meta 'r r)
+
 (def (vec-get j w t)
   (sum j
        (sum w
@@ -17,7 +20,7 @@
 (rec (f R)
      (λ (t j w)
        (+ (* (I (v j w)) (I (= t j)))
-          (* (I (R (- t 1) j w))
+          (* (R (- t 1) j w)
              (* (I (<= 1 (- t 1)))
                 (I (<= j (- t 1))))))))
 
@@ -37,4 +40,5 @@
 (hash-update! type->var 'int? (curry cons (op-- t k)))
 
 (optimize)
-;; (+ (- (vec-get j w t) (vec-get (- t k) w j)) (S (- t 1) k))
+
+;; (+ (- (vec-get j w t) (vec-get j w (- t k))) (S (- t 1) k))

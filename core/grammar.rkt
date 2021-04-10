@@ -76,7 +76,7 @@
       [(constant _ _) (??v)#;(hash-ref! env g (λ () (??v)))]))
 
   ;; tc
-  (define (sketch g)
+  #;(define (sketch g)
     (match g
       [(op-I r)
        (op-+ (??term 0)
@@ -105,7 +105,7 @@
       [_ g]))
 
   ;; sw
-  #;(define (sketch g)
+  (define (sketch g)
     (define (sk g)
       (match g
         [(op-sum v e) (op-sum (hash-ref! env g (λ () (??v))) (sk e))]

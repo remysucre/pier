@@ -19,4 +19,4 @@
 
 (optimize)
 
-;; (+ (I (E 1 y)) (sum z (* (S z) (I (E z y)))))
+;; (+ (I (rel E 1 y)) (sum z (* (I (rel E z y)) (S z))))

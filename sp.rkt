@@ -30,4 +30,4 @@
 
 (optimize)
 
-;; (+ (weight w x z) (sum y (* (S x y) (weight w2 y z))))
+;; (+ (weight w x z) (sum y (* (weight w2 y z) (S x y))))

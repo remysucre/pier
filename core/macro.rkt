@@ -102,5 +102,4 @@
                       (list sum inv))
      #:guarantee (assert (eq? (interpret h-g-r) g-f-r))))
 
-  (display (s->e (evaluate h-g-r M)))
   (extract g-r=>s (s->e (evaluate h-g-r M))))

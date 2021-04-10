@@ -63,8 +63,9 @@
     (hash-set! meta 'fun (cons fun (list 'x ...)))))
 
 (define (e->s p) (exp->struct p symbol->var symbol->rel symbol->fun))
-
 (define (s->e p) (struct->exp p var->symbol rel->symbol fun->symbol))
+(define (normalize e) (semiring e))
+(define (extract rw e) (semiring e "extract" rw))
 
 (define (optimize)
   (define prog

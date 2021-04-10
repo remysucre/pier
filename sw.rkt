@@ -5,35 +5,34 @@
 (decl rel v (~> int? int? bool?))
 (decl var t j w k int?)
 
-(define (r x y w) `(I (R ,x ,y ,w)))
-(hash-set! meta 'r r)
+(idb (r x y w) `(I (rel R ,x ,y ,w)))
 
 (def (vec-get j w t)
   (sum j
        (sum w
-            (* w (* (I (v j w))
+            (* w (* (I (rel v j w))
                     (* (I (= j t))
                        (I (<= 1 j))))))))
 
 ;; R(t,j,w):-v(j,w),t=j.
 ;; R(t,j,w):-R(t-1,j,w),1<=j<t.
-(rec (f R)
+(stratum (f r)
      (λ (t j w)
-       (+ (* (I (v j w)) (I (= t j)))
-          (* (R (- t 1) j w)
+       (+ (* (I (rel v j w)) (I (= t j)))
+          (* (r (- t 1) j w)
              (* (I (<= 1 (- t 1)))
                 (I (<= j (- t 1))))))))
 
 ;; P[t]=sum[j,w:R(t,j,w)*w].
-(ret (g R)
+(stratum (g r)
      (λ (t k)
        (- (sum j
             (sum w
-                 (* (* (R t j w) w)
+                 (* (* (r t j w) w)
                     (* (I (<= 1 j)) (I (<= j t))))))
           (sum j
             (sum w
-                 (* (* (R (- t k) j w) w)
+                 (* (* (r (- t k) j w) w)
                     (* (I (<= 1 j)) (I (<= j (- t k))))))))))
 
 (hash-update! type->var 'int? (curry cons (op-- t 1)))

@@ -4,17 +4,16 @@
 (decl rel E R (~> id? id? bool?))
 (decl var x y z id?)
 
-(define (r x y) `(I (R ,x ,y)))
-(hash-set! meta 'r r)
+(idb (r x y) `(I (rel R ,x ,y)))
 
-(rec (f R)
+(stratum (f r)
      (λ (x y)
-       (+ (I (E x y))
-          (sum z (* (R x z)
-                    (I (E z y)))))))
+       (+ (I (rel E x y))
+          (sum z (* (r x z)
+                    (I (rel E z y)))))))
 
-(ret (g R)
-     (λ (y) (R 1 y)))
+(stratum (g r)
+     (λ (y) (r 1 y)))
 
 (hash-update! type->var 'id? (curry cons 1))
 

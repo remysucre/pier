@@ -34,7 +34,6 @@
       [(op-sum v b) `(sum ,(run v) ,(run b))]
       [(op-rel r es) `(rel ,(hash-ref rel r) ,@(map run es))]
       [(op f es) `(,(hash-ref fun f) ,@(map run es))]
-      ;; [(expression _ r es ...)`(,(hash-ref rel r) ,@(map run es))]
       [_ (hash-ref var e e)]))
   (run e))
 
@@ -54,6 +53,3 @@
               ([current-input-port (open-input-string (~s e))])
               (apply system* (cons semiring-path args))))))
   (read (open-input-string (string-normalize-spaces out))))
-
-(define (normalize e) (semiring e))
-(define (extract rw e) (semiring e "extract" rw))

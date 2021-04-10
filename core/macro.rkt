@@ -8,9 +8,9 @@
 (define int? integer?)
 (define bool? boolean?)
 
-(define rel (make-hash)) ;; symbol->rel
-(define var (make-hash)) ;; symbol->var
-(define fun (make-hash)) ;; symbol->fun
+(define symbol->rel (make-hash))
+(define symbol->var (make-hash))
+(define symbol->fun (make-hash))
 (define var->symbol (make-hash))
 (define fun->symbol (make-hash))
 (define rel->symbol (make-hash))
@@ -28,109 +28,77 @@
 (define-syntax-rule (decl kind x ... type)
   (begin
     (define-symbolic x ... type)
-    ;; setting rel, var, fun
-    (hash-set! kind 'x x) ...
     (match 'kind
-      ['var (begin (hash-set! var->symbol x 'x) ...
+      ['var (begin (hash-set! symbol->var 'x x) ...
+                   (hash-set! var->symbol x 'x) ...
                    (hash-set! type->var 'type (list x ...))
                    (hash-set! var->type x 'type) ... )]
-      ['rel (begin
-              (hash-set! rel->symbol x 'x) ...
-              (hash-set! type->rel (types 'type) (list x ...)))])))
+      ['rel (begin (hash-set! symbol->rel 'x x) ...
+                   (hash-set! rel->symbol x 'x) ...
+                   (hash-set! type->rel (types 'type) (list x ...)))])))
+
+(define-syntax-rule (idb (f x ...) e)
+  (begin (define (f x ...) e)
+         (hash-set! meta 'r f)))
 
 (define-syntax-rule (def (f x ...) e)
   (begin (define (f x ...) e)
-         (hash-set! fun 'f f)
+         (hash-set! symbol->fun 'f f)
          (hash-set! fun->symbol f 'f)
          (hash-set! fun->type f (list (hash-ref var->type x) ...))))
 
-(define-syntax-rule (rec (fun r) (λ (x ...) e))
+(define-syntax-rule (stratum (fun s) (λ (x ...) e))
   (begin
-    (define (fun r)
-    (λ (x ...)
-      (begin
+    (define (fun s)
+      (λ (x ...)
         (define args (make-hash (list (cons 'x x) ...)))
         (define (punctuate p)
           (match p
             [(? symbol?) (hash-ref args p p)]
-            [(cons o xs) (if (eq? o 'r)
-                             (apply r (map punctuate xs))
+            [(cons o xs) (if (eq? o 's)
+                             (apply s (map punctuate xs))
                              (cons o (map punctuate xs)))]
             [_ p]))
-        (punctuate 'e))))
-    (hash-set! meta 'f fun)))
+        (punctuate 'e)))
+    (hash-set! meta 'fun (cons fun (list 'x ...)))))
 
-(define-syntax-rule (ret (fun s) (λ (x ...) e))
-  (begin
-    (define (fun s)
-      (λ (x ...)
-        (begin
-          (define args (make-hash (list (cons 'x x) ...)))
-          (define (punctuate p)
-            (match p
-              [(? symbol?) (hash-ref args p p)]
-              [(cons o xs) (if (eq? o 's)
-                               (apply s (map punctuate xs))
-                               (cons o (map punctuate xs)))]
-              [_ p])
-            )
-          (punctuate 'e))))
-    (hash-set! meta 'g fun)
-    (hash-set! meta 'g-args (list 'x ...))))
+(define (e->s p) (exp->struct p symbol->var symbol->rel symbol->fun))
+
+(define (s->e p) (struct->exp p var->symbol rel->symbol fun->symbol))
 
 (define (optimize)
   (define prog
-    (let* ([g (hash-ref meta 'g)]
-           [f (hash-ref meta 'f)]
+    (let* ([f (car (hash-ref meta 'f))]
+           [g (car (hash-ref meta 'g))]
+           [xs (cdr (hash-ref meta 'g))]
            [r (hash-ref meta 'r)]
-           [xs (hash-ref meta 'g-args)]
-           [norm (λ (p) (normalize p var rel fun))]
-           [prep (λ (p) (preprocess p var rel fun))]
            [p (apply (g (f r)) xs)])
-      (interpret (prep (deserialize (norm p))))))
+      (interpret (e->s (deserialize (normalize p))))))
 
-  (define (g-R)
-    (define g (hash-ref meta 'g))
-    (define r (hash-ref meta 'r))
-    (define xs (hash-ref meta 'g-args))
-    (define (norm p) (normalize p var rel fun))
-    (define (prep p) (preprocess p var rel fun))
-    (prep (norm (apply (g r) xs))))
+  (define g-r
+    (let* ([r (hash-ref meta 'r)]
+           [g (car (hash-ref meta 'g))]
+           [xs (cdr (hash-ref meta 'g))])
+      (normalize (apply (g r) xs))))
 
-  (define (g-n)
-    (define g (hash-ref meta 'g))
-    (define r (hash-ref meta 'r))
-    (define xs (hash-ref meta 'g-args))
-    (define (norm p) (normalize p var rel fun))
-    (norm (apply (g r) xs)))
-
-  (define (rewrite)
-    ;; (define (? x) `(var ,(string->symbol (~s '? x #:separator ""))))
-    ;; TODO need to remove var for sw
-    (define (? x) (~a '? x))
-    (define xs (hash-ref meta 'g-args))
-    (define lhs (make-pattern (serialize (g-n) rel var fun)))
-    (~a lhs `(S ,@(map ? xs)) #:separator "=>"))
+  (define rewrite
+    (let ([xs (cdr (hash-ref meta 'g))]
+          [lhs (make-pattern (serialize g-r))])
+      (~a lhs `(S ,@(map make-pattern xs)) #:separator "=>")))
 
   (define sketch
     (gen-grammar type->var type->rel fun->type
                  #;(list op-+ op-*)
                  (list op-+ op-* op--)
                  #;(list op-+ op-* op-/)
-                 (g-R)))
+                 (e->s g-r)))
 
   (define M
     (synthesize
-     #:forall (append (hash-values rel)
-                      (hash-values var)
-                      (hash-values fun)
+     #:forall (append (hash-values symbol->rel)
+                      (hash-values symbol->var)
+                      (hash-values symbol->fun)
                       (list sum inv))
      #:guarantee (assert (eq? (interpret sketch) prog))))
 
-  (define hg (serialize (postprocess (evaluate sketch M)
-                                     var->symbol
-                                     rel->symbol
-                                     fun->symbol)
-                        rel var fun))
-
-  (display (extract (rewrite) hg)))
+  (extract rewrite (serialize (s->e (evaluate sketch M)))))

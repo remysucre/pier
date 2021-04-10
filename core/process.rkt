@@ -15,7 +15,7 @@
       [`(- ,x ,y) (op-- (run x) (run y))]
       [`(= ,x ,y) (op-eq? (run x) (run y))]
       [`(<= ,x ,y) (op-leq (run x) (run y))]
-      [`(sum ,y ,e) (op-sum (hash-ref var y) (run e))]
+      [`(sum ,y ,e) (op-sum (run y) (run e))]
       [`(rel ,r ,vs ...) (op-rel (hash-ref rel r) (map run vs))]
       [`(,f ,vs ...) (op (hash-ref fun f) (map run vs))]
       [_ (hash-ref var e e)]))
@@ -34,6 +34,6 @@
       [(op-sum v b) `(sum ,(run v) ,(run b))]
       [(op-rel r es) `(rel ,(hash-ref rel r) ,@(map run es))]
       [(op f es) `(,(hash-ref fun f) ,@(map run es))]
-      [(expression _ r es ...)`(,(hash-ref rel r) ,@(map run es))]
+      ;; [(expression _ r es ...)`(,(hash-ref rel r) ,@(map run es))]
       [_ (hash-ref var e e)]))
   (run e))

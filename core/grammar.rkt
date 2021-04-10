@@ -59,7 +59,7 @@
   (define env (make-hash))
 
   ;; sp
-  (define (sketch g)
+  #;(define (sketch g)
     (match g
       ;; specialize (??v) with type
       [(op-sum v e)
@@ -76,7 +76,7 @@
       [(constant _ _) (??v)#;(hash-ref! env g (λ () (??v)))]))
 
   ;; tc
-  #;(define (sketch g)
+  (define (sketch g)
     (match g
       [(op-I r)
        (op-+ (??term 0)

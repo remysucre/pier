@@ -2,7 +2,7 @@
 
 (provide (all-defined-out))
 
-(require "interpret.rkt" "grammar.rkt" "ops.rkt" "process.rkt" "serialize.rkt")
+(require "interpret.rkt" "grammar.rkt" "ops.rkt" "util.rkt")
 
 (define id? integer?)
 (define int? integer?)
@@ -73,7 +73,7 @@
            [xs (cdr (hash-ref meta 'g))]
            [r (hash-ref meta 'r)]
            [p (apply (g (f r)) xs)])
-      (interpret (e->s (deserialize (normalize p))))))
+      (interpret (e->s (normalize p)))))
 
   (define g-r
     (let* ([r (hash-ref meta 'r)]
@@ -83,7 +83,7 @@
 
   (define rewrite
     (let ([xs (cdr (hash-ref meta 'g))]
-          [lhs (make-pattern (serialize g-r))])
+          [lhs (make-pattern g-r)])
       (~a lhs `(S ,@(map make-pattern xs)) #:separator "=>")))
 
   (define sketch
@@ -101,4 +101,4 @@
                       (list sum inv))
      #:guarantee (assert (eq? (interpret sketch) prog))))
 
-  (extract rewrite (serialize (s->e (evaluate sketch M)))))
+  (extract rewrite (s->e (evaluate sketch M))))

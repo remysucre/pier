@@ -16,6 +16,7 @@
      (λ (y) (r 1 y)))
 
 (hash-update! type->var 'id? (curry cons 1))
+(hash-update! type->var 'id? (curry cons 0))
 
 (optimize)
 

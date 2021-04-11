@@ -56,10 +56,27 @@
                             (??agg 0
                                    (op-* e (??factor 1))))))]))
 
-  (define env (make-hash))
+  #;(define env (make-hash))
+
+  (define (sketch g)
+    (define (sk g)
+      (match g
+      [(op-sum v e) (sk e)]
+      [(op-* x y) (op-* (sk x) (sk y))]
+      [(op-- x y) (op-- (sk x) (sk y))]
+      [(op-leq x y) (op-leq (sk x) (sk y))]
+      [(op-rel R xs) (op-rel R (map sk xs))]
+      [(op-I r) (op-I (sk r))]
+      [(? constant? g) (??v)]
+      [_ g]))
+    (op-+ (??term 0)
+          (op-sum (??v)
+                  (op-sum (??v)
+                          (op-* (sk g)
+                                (??factor 0))))))
 
   ;; sp
-  (define (sketch g)
+  #;(define (sketch g)
     (match g
       ;; specialize (??v) with type
       [(op-sum v e)
@@ -115,7 +132,8 @@
         [(op-rel R xs) (op-rel R (map sk xs))]
         [(op-I r) (op-I (sk r))]
         [(constant _ _) (hash-ref! env g (λ () (??v)))]
-        [_ g]))
+        [_ g]
+        ))
     (op-+ (op-- (??term 0) (??term 0))
           (sk g)))
 

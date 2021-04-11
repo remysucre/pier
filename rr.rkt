@@ -15,12 +15,13 @@
 (stratum (g r)
      (λ (y) (r 1 y)))
 
-(hash-update! type->var 'id? (curry cons 1))
-
 (define-symbolic a b c integer?)
 (assert (forall (list a b c)
                 (<=> (&& (E a b) (R b c))
                      (&& (R a b) (E b c)))))
+
+(hash-update! type->var 'id? (curry cons 0))
+(hash-update! type->var 'id? (curry cons 1))
 
 (optimize)
 

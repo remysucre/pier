@@ -32,3 +32,4 @@
 
 (define-symbolic temp integer?)
 (assert (forall (list temp) (= (sum temp 0) 0)))
+(assert (forall (list temp) (= (sum 0 temp) temp)))

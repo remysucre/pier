@@ -37,6 +37,7 @@
 
 (hash-update! type->var 'int? (curry cons (op-- t 1)))
 (hash-update! type->var 'int? (curry cons (op-- t k)))
+(hash-update! type->var 'int? (curry cons 0))
 
 (optimize)
 

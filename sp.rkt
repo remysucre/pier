@@ -21,6 +21,8 @@
      (I (rel E x z w))
      ;; R(x,z,w) :- R(x,y,w1), E(y,x,w2), w=w1+w2.
      (sum y (sum w1 (sum w2
+       #;(* (* (r x y w1) (r y z w2)) (I (= w (* w1 w2))))
+       #;(* (* (I (rel E x y w1)) (r y z w2)) (I (= w (* w1 w2))))
        (* (* (r x y w1) (I (rel E y z w2))) (I (= w (* w1 w2))))))))))
 
 ;; "return" stratum

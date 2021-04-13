@@ -66,3 +66,9 @@
 ;; (evaluate sketch M)
 
 (optimize p g)
+
+#;(+ (sum t (* (I (E v t))
+               (delta s v t)))
+     (sum u (sum t (* (I (E v t))
+                      (* (delta s v t)
+                         (delta (s t u)))))))

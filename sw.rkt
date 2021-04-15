@@ -1,9 +1,10 @@
 #lang rosette
 (require "core/lib.rkt")
 
-(decl rel R (~> int? int? int? bool?))
-(decl rel v (~> int? int? bool?))
-(decl var t j w k int?)
+(decl rel R (~> id? id? int? bool?))
+(decl rel v (~> id? int? bool?))
+(decl var t j k id?)
+(decl var w int?)
 
 (idb (r x y w) `(I (rel R ,x ,y ,w)))
 
@@ -35,9 +36,9 @@
                  (* (* (r (- t k) j w) w)
                     (* (I (<= 1 j)) (I (<= j (- t k))))))))))
 
-(hash-update! type->var 'int? (curry cons (op-- t 1)))
-(hash-update! type->var 'int? (curry cons (op-- t k)))
-(hash-update! type->var 'int? (curry cons 0))
+(hash-update! type->var 'id? (curry cons (op-- t 1)))
+(hash-update! type->var 'id? (curry cons (op-- t k)))
+;; (hash-update! type->var 'int? (curry cons 0))
 
 (optimize)
 

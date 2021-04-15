@@ -12,10 +12,10 @@
 (idb (sig s t) `(rel sigma ,s ,t))
 
 (def (delta s v t)
-  (* (* (* (rel sigma s v)
+  (div (* (* (rel sigma s v)
            (rel sigma v t))
         (I (= (rel D s t) (+ (rel D s v) (rel D v t)))))
-     (inv (rel sigma s t))))
+       (rel sigma s t)))
 
 (assert (forall (list s t u) (<= (D s u) (+ (D s t) (D t u)))))
 (assert (forall (list s t) (<=> (E s t) (= 1 (D s t)))))

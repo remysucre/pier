@@ -1,5 +1,6 @@
 #lang rosette
 
+(require rosette/lib/synthax) ; provides `choose*`
 (require rosette/lib/angelic) ; provides `choose*`
 
 (require "ops.rkt")
@@ -26,7 +27,9 @@
 
   (define (??fun)
     (define (gen-fun ft)
-      (match ft [(cons f ts) (op f (??vars ts)#;(map ??var t))]))
+      (match ft [(cons f ts)
+                 (let ([vs (map ??var ts)])
+                   (op f vs))]))
     (map gen-fun (hash->list fun->type)))
 
   (define (??factor depth)
@@ -56,12 +59,12 @@
                             (??agg 0
                                    (op-* e (??factor 1))))))]))
 
-  #;(define env (make-hash))
+  (define env (make-hash))
 
-  (define (sketch g)
+  #;(define (sketch g)
     (define (sk g)
       (match g
-      [(op-sum v e) (sk e)]
+      [(op-sum v e) (begin (hash-clear! env) (sk e))]
       [(op-* x y) (op-* (sk x) (sk y))]
       [(op-+ x y) (op-+ (sk x) (sk y))]
       [(op-- x y) (op-- (sk x) (sk y))]
@@ -72,15 +75,16 @@
       [(op-rel R xs) (op-rel R (map sk xs))]
       [(op f xs) (op f (map sk xs))]
       [(op-I r) (op-I (sk r))]
-      [(? constant? g) (??v)]
+      [(? constant? g) (hash-ref! env g (λ () (??v)))]
       [_ g]))
-    (op-+ (op-sum (??v) (op-* (apply choose* (??fun)) (apply choose* (??rel))))
-          (op-sum (??v)
-                  (op-sum (??v)
+    #;(op-+ (op-sum (??var 'id?) (op-* #;(sk g) (apply choose* (??fun))
+                                     (apply choose* (??rel))))
+          (op-sum (??var 'id?)
+                  (op-sum (??var 'id?)
                           (op-* (sk g)
                                 (op-* (apply choose* (??rel))
                                       (apply choose* (??fun)))))))
-    #;(op-+ (??term 0)
+    (op-+ (??term 0)
           (op-sum (??v)
                   (op-sum (??v)
                           (op-* (sk g)
@@ -133,7 +137,7 @@
       [_ g]))
 
   ;; sw
-  #;(define (sketch g)
+  (define (sketch g)
     (define (sk g)
       (match g
         [(op-sum v e) (op-sum (hash-ref! env g (λ () (??v))) (sk e))]

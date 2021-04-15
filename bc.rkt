@@ -9,6 +9,8 @@
 
 (decl var s t u v id?)
 
+(idb (sig s t) `(rel sigma ,s ,t))
+
 (def (delta s v t)
   (* (* (* (sigma s v) (sigma v t))
         (I (eq? (D s t) (+ (D s v) (D v t)))))
@@ -21,20 +23,26 @@
 (assert (= (* (inv (sigma s u)) (sigma s u)) 1))
 (assert (= (* (inv (sigma s t)) (sigma s t)) 1))
 
-(define p
-  (+ (sum t (* (I (E v t))
-               (delta s v t)))
-     (sum u
-          (sum t
-               (div (* (* (I (E v t))
-                          (* (I (eq? (D s u)
-                                     (+ (D s v) (D v u))))
-                             (I (eq? (D v u)
-                                     (+ 1 (D t u))))))
-                       (* (sigma s v) (sigma t u)))
-                    (sigma s u))))))
+(stratum (f sig)
+         (λ (v t) (+
+            (I (rel E v t))
+            (sum u
+                 (* (* (sig u t) (I (rel E v u)))
+                    (I (= (rel D v t) (+ 1 (rel D u t)))))))))
 
-(define g (op-sum t (op delta (list s v t))))
+(stratum (g sig)
+         (λ (s v)
+           (sum t
+                (* (I (= (rel D s t) (+ (rel D s v) (rel D v t))))
+                   (div (* (rel sigma s v) (sig v t))
+                        (rel sigma s t))))))
+
+(define p (interpret (exp->struct (normalize ((g (f sig)) 's 'v)) symbol->var symbol->rel symbol->fun)))
+
+(define opt (+ (sum t (* (I (E v t)) (delta s v t)))
+               (sum t (sum u (* (I (E v u)) (* (delta s v u) (delta s u t)))))))
+
+(verify (assert (= p opt)))
 
 ;; (define (pick ts)
 ;;     (let ([vss (apply cartesian-product (map (curry hash-ref type->var) ts))])
@@ -65,7 +73,7 @@
 
 ;; (evaluate sketch M)
 
-(optimize p g)
+;; (optimize)
 
 #;(+ (sum t (* (I (E v t))
                (delta s v t)))

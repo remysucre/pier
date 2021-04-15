@@ -76,6 +76,7 @@
            [p (apply (g (f r)) xs)])
       (interpret (e->s (normalize p)))))
 
+
   (define g-r
     (let* ([r (hash-ref meta 'r)]
            [g (car (hash-ref meta 'g))]

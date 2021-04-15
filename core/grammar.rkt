@@ -63,18 +63,23 @@
       (match g
       [(op-sum v e) (sk e)]
       [(op-* x y) (op-* (sk x) (sk y))]
+      [(op-+ x y) (op-+ (sk x) (sk y))]
       [(op-- x y) (op-- (sk x) (sk y))]
       [(op-/ x y) (op-/ (sk x) (sk y))]
+      [(op-inv x) (op-inv (sk x))]
+      [(op-eq? x y) (op-eq? (sk x) (sk y))]
       [(op-leq x y) (op-leq (sk x) (sk y))]
       [(op-rel R xs) (op-rel R (map sk xs))]
+      [(op f xs) (op f (map sk xs))]
       [(op-I r) (op-I (sk r))]
       [(? constant? g) (??v)]
       [_ g]))
-    (op-+ (op-sum (??v) (op-* (sk g) (??factor 0)))
+    (op-+ (op-sum (??v) (op-* (apply choose* (??fun)) (apply choose* (??rel))))
           (op-sum (??v)
                   (op-sum (??v)
                           (op-* (sk g)
-                                (??factor 0)))))
+                                (op-* (apply choose* (??rel))
+                                      (apply choose* (??fun)))))))
     #;(op-+ (??term 0)
           (op-sum (??v)
                   (op-sum (??v)

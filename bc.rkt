@@ -12,9 +12,10 @@
 (idb (sig s t) `(rel sigma ,s ,t))
 
 (def (delta s v t)
-  (* (* (* (sigma s v) (sigma v t))
-        (I (eq? (D s t) (+ (D s v) (D v t)))))
-     (inv (sigma s t))))
+  (* (* (* (rel sigma s v)
+           (rel sigma v t))
+        (I (= (rel D s t) (+ (rel D s v) (rel D v t)))))
+     (inv (rel sigma s t))))
 
 (assert (forall (list s t u) (<= (D s u) (+ (D s t) (D t u)))))
 (assert (forall (list s t) (<=> (E s t) (= 1 (D s t)))))
@@ -36,13 +37,6 @@
                 (* (I (= (rel D s t) (+ (rel D s v) (rel D v t))))
                    (div (* (rel sigma s v) (sig v t))
                         (rel sigma s t))))))
-
-(define p (interpret (exp->struct (normalize ((g (f sig)) 's 'v)) symbol->var symbol->rel symbol->fun)))
-
-(define opt (+ (sum t (* (I (E v t)) (delta s v t)))
-               (sum t (sum u (* (I (E v u)) (* (delta s v u) (delta s u t)))))))
-
-(verify (assert (= p opt)))
 
 ;; (define (pick ts)
 ;;     (let ([vss (apply cartesian-product (map (curry hash-ref type->var) ts))])
@@ -73,7 +67,16 @@
 
 ;; (evaluate sketch M)
 
-;; (optimize)
+(optimize)
+
+#;(+ (* (rel sigma s v)
+        (sum t (* (I (= (rel D s t) (+ (rel D v t) (rel D s v))))
+                  (* (I (rel E v t)) (* (rel sigma v t) (inv (rel sigma s t)))))))
+     (sum u (* (I (rel E v u))
+               (* (delta s v u) (S s u)))))
+
+;; (sum t (+ (* (delta s v t) (I (rel E v t)))
+;;           (sum u (* (delta s v u) (* (I (rel E v u)) (delta s u t))))))
 
 #;(+ (sum t (* (I (E v t))
                (delta s v t)))

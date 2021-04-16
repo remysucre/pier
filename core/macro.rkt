@@ -76,7 +76,7 @@
            [xs (cdr (hash-ref meta 'g))]
            [r (hash-ref meta 'r)]
            [p (apply (g (f r)) xs)])
-      (interpret (dbg (e->s (normalize p))))))
+      (interpret (e->s (normalize p)))))
 
 
   (define g-r

@@ -1,6 +1,7 @@
 #lang rosette
 (require "core/lib.rkt")
 (require rosette/lib/angelic) ; provides `choose*`
+(require rosette/lib/synthax) ; provides `choose*`
 
 ;; HACK shadowing D
 (decl rel D (~> id? id? int?))
@@ -38,48 +39,36 @@
                    (div (* (rel sigma s v) (sig v t))
                         (rel sigma s t))))))
 
-;; (define (pick ts)
-;;     (let ([vss (apply cartesian-product (map (curry hash-ref type->var) ts))])
-;;       (apply choose* (filter (negate check-duplicates) vss))))
+(define ??s (choose* s t u v))
+(define ??v (choose* s t u v))
+(define ??t (choose* s t u v))
+(define (??var) (choose* s t u v))
 
-;; (define (??factor d)
-;;   (if (= 0 d)
-;;       (choose* (let ([r (choose* (lambda (vs) (op-rel sigma vs))
-;;                                  (lambda (vs) (op-I (op-rel E vs))))])
-;;                  (r (pick '(id? id?))))
-;;                (op delta (pick '(id? id? id?))))
-;;       ((choose* op-+ op-* op-/) (??factor (- d 1)) (??factor (- d 1)))))
+(define (??base) (choose* (op-I (op-rel E (list (??var) (??var))))
+                          (op-rel sigma (list (??var) (??var)))
+                          (op delta (list (??var) (??var) (??var)))))
+(define ??term-1 (op-* (??base) (??base)))
 
-;; (define sketch
-;;   (op-+ (op-sum t (op-* (op delta (list s v t))
-;;                         (??factor 0)))
-;;         (op-sum (choose* s v t u)
-;;                 (op-sum t
-;;                         (op-* (op delta (list s v t)) (??factor 1))))))
+(define p
+  (op-+ (op-sum t (op-* (op-I (op-eq? (op-rel D (list s t)) (op-+ (op-rel D (list s v)) (op-rel D (list v t)))))
+                        (op-* (op-inv (op-rel sigma (list s t))) (op-* (op-rel sigma (list s v)) (op-I (op-rel E (list v t)))))))
+        (op-sum
+         t (op-sum
+            u (op-* (op-* (op-I (op-rel E (list v u))) (??base))#;??term-1
+                    (op-* (op-I (op-eq? (op-rel D (list ??s ??t))
+                                        (op-+ (op-rel D (list ??s ??v)) (op-rel D (list ??v ??t)))))
+                          (op-* (op-* (op-rel sigma (list ??s ??v))
+                                      (op-rel sigma (list ??v ??t)))
+                                (op-inv (op-rel sigma (list ??s ??t))))))))))
 
-;; (define M
-;;   (synthesize
-;;    #:forall (append (hash-values rel)
-;;                     (hash-values var)
-;;                     (hash-values fun)
-;;                     (list sum inv))
-;;    #:guarantee (assert (eq? (interpret sketch) p))))
+(define opt (+ (sum t (* (delta s v t) (I (rel E v t))))
+               (sum t (sum u (* (delta s v u) (* (I (rel E v u)) (delta s u t)))))))
 
-;; (evaluate sketch M)
-
-(optimize)
-
-#;(+ (* (rel sigma s v)
-        (sum t (* (I (= (rel D s t) (+ (rel D v t) (rel D s v))))
-                  (* (I (rel E v t)) (* (rel sigma v t) (inv (rel sigma s t)))))))
-     (sum u (* (I (rel E v u))
-               (* (delta s v u) (S s u)))))
-
-;; (sum t (+ (* (delta s v t) (I (rel E v t)))
-;;           (sum u (* (delta s v u) (* (I (rel E v u)) (delta s u t))))))
-
-#;(+ (sum t (* (I (E v t))
-               (delta s v t)))
-     (sum u (sum t (* (I (E v t))
-                      (* (delta s v t)
-                         (delta (s t u)))))))
+(define M
+  (synthesize
+   #:forall (append (hash-values symbol->rel)
+                    (hash-values symbol->var)
+                    #;(hash-values symbol->fun)
+                    (list sum inv))
+   #:guarantee (assert (eq? (interpret p) opt))))
+(evaluate p M)

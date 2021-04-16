@@ -22,6 +22,8 @@
 
 (define meta (make-hash))
 
+(define (dbg e) (begin (print e) e))
+
 (define (types t)
   (match t [`(~> ,ts ... ,t) (cons ts t)]))
 
@@ -74,7 +76,7 @@
            [xs (cdr (hash-ref meta 'g))]
            [r (hash-ref meta 'r)]
            [p (apply (g (f r)) xs)])
-      (interpret (e->s (normalize p)))))
+      (interpret (dbg (e->s (normalize p))))))
 
 
   (define g-r

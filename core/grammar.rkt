@@ -61,7 +61,7 @@
 
   (define env (make-hash))
 
-  #;(define (sketch g)
+  (define (sketch g)
     (define (sk g)
       (match g
       [(op-sum v e) (begin (hash-clear! env) (sk e))]
@@ -137,7 +137,7 @@
       [_ g]))
 
   ;; sw
-  (define (sketch g)
+  #;(define (sketch g)
     (define (sk g)
       (match g
         [(op-sum v e) (op-sum (hash-ref! env g (λ () (??v))) (sk e))]

@@ -54,15 +54,14 @@
                         (op-* (op-inv (op-rel sigma (list s t))) (op-* (op-rel sigma (list s v)) (op-I (op-rel E (list v t)))))))
         (op-sum
          t (op-sum
-            u (op-* (op-* (op-I (op-rel E (list v u))) (??base))#;??term-1
+            u (op-* (op-* (op-I (op-rel E (list v u))) (??base))
                     (op-* (op-I (op-eq? (op-rel D (list ??s ??t))
                                         (op-+ (op-rel D (list ??s ??v)) (op-rel D (list ??v ??t)))))
                           (op-* (op-* (op-rel sigma (list ??s ??v))
                                       (op-rel sigma (list ??v ??t)))
                                 (op-inv (op-rel sigma (list ??s ??t))))))))))
 
-(define opt (+ (sum t (* (delta s v t) (I (rel E v t))))
-               (sum t (sum u (* (delta s v u) (* (I (rel E v u)) (delta s u t)))))))
+(define g-f-r (exp->struct (normalize ((g (f sig)) 's 'v)) symbol->var symbol->rel symbol->fun))
 
 (define M
   (synthesize
@@ -70,5 +69,6 @@
                     (hash-values symbol->var)
                     #;(hash-values symbol->fun)
                     (list sum inv))
-   #:guarantee (assert (eq? (interpret p) opt))))
+   #:guarantee (assert (eq? (interpret p) (interpret g-f-r)))))
+
 (evaluate p M)

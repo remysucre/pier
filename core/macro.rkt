@@ -4,6 +4,8 @@
 
 (require "interpret.rkt" "grammar.rkt" "ops.rkt" "util.rkt")
 
+(require rosette/lib/value-browser)
+
 (define id? integer?)
 (define int? integer?)
 (define bool? boolean?)
@@ -76,7 +78,7 @@
            [xs (cdr (hash-ref meta 'g))]
            [r (hash-ref meta 'r)]
            [p (apply (g (f r)) xs)])
-      (interpret (dbg (e->s (normalize p))))))
+      (e->s (normalize p))))
 
 
   (define g-r
@@ -90,12 +92,15 @@
           [lhs (make-pattern g-r)])
       (~a lhs `(S ,@(map make-pattern xs)) #:separator "=>")))
 
+  (define (r xs)
+    (e->s (apply (hash-ref meta 'r) xs)))
+
   (define h-g-r
-    (gen-grammar type->var type->rel fun->type
+      (gen-grammar type->var type->rel fun->type
                  #;(list op-+ op-*)
                  (list op-+ op-* op--)
                  #;(list op-+ op-* op-/)
-                 (e->s g-r)))
+                 r g-f-r (e->s g-r)))
 
   (define M
     (synthesize
@@ -103,6 +108,6 @@
                       (hash-values symbol->var)
                       #;(hash-values symbol->fun)
                       (list sum inv))
-     #:guarantee (assert (eq? (interpret h-g-r) g-f-r))))
+     #:guarantee (assert (eq? (interpret h-g-r) (interpret g-f-r)))))
 
   (extract g-r=>s (s->e (evaluate h-g-r M))))

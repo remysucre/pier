@@ -7,7 +7,56 @@
 
 (provide (all-defined-out))
 
-(define (gen-grammar type->var type->rel fun->type ops g)
+(define (gen-grammar type->var type->rel fun->type ops r p g)
+
+  (define (rec? p)
+    (match p
+      [(op-rel _ xs) (or (eq? (r xs) p) (eq? (r xs) (op-I p)))]
+      [(op _ xs) (or (map rec? xs))]
+      [(op-I x) (rec? x)]
+      [(op-&& x y) (or (rec? x) (rec? y))]
+      [(op-|| x y) (or (rec? x) (rec? y))]
+      [(op-+ x y) (or (rec? x) (rec? y))]
+      [(op-- x y) (or (rec? x) (rec? y))]
+      [(op-* x y) (or (rec? x) (rec? y))]
+      [(op-/ x y) (or (rec? x) (rec? y))]
+      [(op-inv x) (rec? x)]
+      [(op-eq? x y) (or (rec? x) (rec? y))]
+      [(op-leq x y) (or (rec? x) (rec? y))]
+      [(op-sum _ e) (rec? e)]
+      [(op-exists _ e) (rec? e)]
+      [_ #f]))
+
+  (define env (make-hash))
+
+  (define (sk g)
+    (match g
+      [(op-sum v e) (begin (hash-clear! env) (sk e))]
+      [(op-* x y) (op-* (sk x) (sk y))]
+      [(op-+ x y) (op-+ (sk x) (sk y))]
+      [(op-- x y) (op-- (sk x) (sk y))]
+      [(op-/ x y) (op-/ (sk x) (sk y))]
+      [(op-inv x) (op-inv (sk x))]
+      [(op-eq? x y) (op-eq? (sk x) (sk y))]
+      [(op-leq x y) (op-leq (sk x) (sk y))]
+      [(op-rel R xs) (op-rel R (map sk xs))]
+      [(op f xs) (op f (map sk xs))]
+      [(op-I r) (op-I (sk r))]
+      [(? constant? g) (hash-ref! env g (λ () (??v)))]
+      [_ g]))
+
+  (define (sketch p g)
+    (if (rec? p)
+        (match p
+          [(op-+ x y)
+           (match g
+             [(op-+ a b) (op-+ (sketch x a) (sketch y b))]
+             [_ (op-+ (sketch x g) (sketch y g))])]
+          [(op-sum x e) (op-sum x (sketch e g))]
+          [(op-* _ _) (op-* (??factor 0) (sk g))]
+          [_ p])
+        p))
+
   (define (??var t) (apply choose* (hash-ref type->var t)))
   (define (??vars ts)
     (let ([vss (apply cartesian-product (map (curry hash-ref type->var) ts))])
@@ -37,119 +86,4 @@
         (apply choose* (append ws (??rel) (??fun) (list 0 1)))
         ((??o) (??factor (- depth 1)) (??factor (- depth 1)))))
 
-  (define (??term depth)
-    (if (= 0 depth)
-        (??factor 0)
-        (choose* (??factor depth)
-                 (op-sum (??v) (??term (- depth 1))))))
-
-  (define (??agg depth e)
-    (if (= depth 0)
-      e
-      (op-sum (??v) (??agg (- depth 1) e))))
-
-  ;; FIXME only 1 level of aggregate
-  ;; bc
-  #;(define (sketch g)
-    (match g
-      [(op-sum w e)
-       (op-+ (op-sum w (op-* e (??factor 0)))
-             (??agg 1
-                    (op-sum w
-                            (??agg 0
-                                   (op-* e (??factor 1))))))]))
-
-  (define env (make-hash))
-
-  (define (sketch g)
-    (define (sk g)
-      (match g
-      [(op-sum v e) (begin (hash-clear! env) (sk e))]
-      [(op-* x y) (op-* (sk x) (sk y))]
-      [(op-+ x y) (op-+ (sk x) (sk y))]
-      [(op-- x y) (op-- (sk x) (sk y))]
-      [(op-/ x y) (op-/ (sk x) (sk y))]
-      [(op-inv x) (op-inv (sk x))]
-      [(op-eq? x y) (op-eq? (sk x) (sk y))]
-      [(op-leq x y) (op-leq (sk x) (sk y))]
-      [(op-rel R xs) (op-rel R (map sk xs))]
-      [(op f xs) (op f (map sk xs))]
-      [(op-I r) (op-I (sk r))]
-      [(? constant? g) (hash-ref! env g (λ () (??v)))]
-      [_ g]))
-    #;(op-+ (op-sum (??var 'id?) (op-* #;(sk g) (apply choose* (??fun))
-                                     (apply choose* (??rel))))
-          (op-sum (??var 'id?)
-                  (op-sum (??var 'id?)
-                          (op-* (sk g)
-                                (op-* (apply choose* (??rel))
-                                      (apply choose* (??fun)))))))
-    (op-+ (??term 0)
-          (op-sum (??v)
-                  (op-sum (??v)
-                          (op-* (sk g)
-                                (??factor 0))))))
-
-  ;; sp
-  #;(define (sketch g)
-    (match g
-      ;; specialize (??v) with type
-      [(op-sum v e)
-       (op-+ (op-+ (op-sum (??v)#;(hash-ref! env v (λ () (??v)))
-                     (op-* (sketch e) (??factor 0)))
-                   (??term 0))
-             (??agg 1
-                    (op-sum (??v)#;(hash-ref! env v (λ () (??v)))
-                            (??agg 0 (op-* (??factor 0)
-                                           (sketch e))))))]
-      [(op-* x y) (op-* (sketch x) (sketch y))]
-      [(op-rel R xs) (op-rel R (map sketch xs))]
-      [(op-I r) (op-I (sketch r))]
-      [(constant _ _) (??v)#;(hash-ref! env g (λ () (??v)))]))
-
-  ;; tc
-  #;(define (sketch g)
-    (match g
-      [(op-I r)
-       (op-+ (??term 0)
-             (??agg 1
-                    (op-* (??factor 0)
-                          (op-I (sketch r)))))]
-      [(op-rel R xs) (op-rel R (map sketch xs))]
-      [(constant _ _) (??v)#;(hash-ref! env g (λ () (??v)))]
-      [_ g]))
-
-  ;; rt
-  #;(define (sketch g)
-    (match g
-      [(op-sum j (op-sum w e))
-       (op-+ (??term 0)
-             (op-sum (??v)
-                     (op-sum (??v)
-                             (op-* (sketch e)
-                                   (??factor 0)))))]
-      [(op-* x y) (op-* (sketch x) (sketch y))]
-      [(op-- x y) (op-- (sketch x) (sketch y))]
-      [(op-leq x y) (op-leq (sketch x) (sketch y))]
-      [(op-rel R xs) (op-rel R (map sketch xs))]
-      [(op-I r) (op-I (sketch r))]
-      [(constant _ _) (??v)#;(hash-ref! env g (λ () (??v)))]
-      [_ g]))
-
-  ;; sw
-  #;(define (sketch g)
-    (define (sk g)
-      (match g
-        [(op-sum v e) (op-sum (hash-ref! env g (λ () (??v))) (sk e))]
-        [(op-* x y) (op-* (sk x) (sk y))]
-        [(op-- x y) (op-- (sk x) (sk y))]
-        [(op-leq x y) (op-leq (sk x) (sk y))]
-        [(op-rel R xs) (op-rel R (map sk xs))]
-        [(op-I r) (op-I (sk r))]
-        [(constant _ _) (hash-ref! env g (λ () (??v)))]
-        [_ g]
-        ))
-    (op-+ (op-- (??term 0) (??term 0))
-          (sk g)))
-
-  (sketch g))
+  (sketch p g))

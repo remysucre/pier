@@ -49,7 +49,7 @@
                   (op-* (op-I (op-leq 1 j))
                         (op-I (op-leq j ??t-1))))))))
 
-(define g-f-r (interpret (exp->struct (normalize ((g (f r)) 't)) symbol->var symbol->rel symbol->fun)))
+(define g-f-r (exp->struct (normalize ((g (f r)) 't)) symbol->var symbol->rel symbol->fun))
 
 (define M
   (synthesize
@@ -57,7 +57,7 @@
                     (hash-values symbol->var)
                     #;(hash-values symbol->fun)
                     (list sum inv))
-   #:guarantee (assert (eq? (interpret sketch) g-f-r))))
+   #:guarantee (assert (eq? (interpret sketch) (interpret g-f-r)))))
 (evaluate sketch M)
 
 ;; (optimize)

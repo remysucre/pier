@@ -39,36 +39,38 @@
                    (div (* (rel sigma s v) (sig v t))
                         (rel sigma s t))))))
 
-(define ??s (choose* s t u v))
-(define ??v (choose* s t u v))
-(define ??t (choose* s t u v))
-(define (??var) (choose* s t u v))
+(optimize)
 
-(define (??base) (choose* (op-I (op-rel E (list (??var) (??var))))
-                          (op-rel sigma (list (??var) (??var)))
-                          (op delta (list (??var) (??var) (??var)))))
-(define ??term-1 (op-* (??base) (??base)))
+;; (define ??s (choose* s t u v))
+;; (define ??v (choose* s t u v))
+;; (define ??t (choose* s t u v))
+;; (define (??var) (choose* s t u v))
 
-(define p
-  (op-+ (op-sum t (op-* (op-I (op-eq? (op-rel D (list s t)) (op-+ (op-rel D (list s v)) (op-rel D (list v t)))))
-                        (op-* (op-inv (op-rel sigma (list s t))) (op-* (op-rel sigma (list s v)) (op-I (op-rel E (list v t)))))))
-        (op-sum
-         t (op-sum
-            u (op-* (op-* (op-I (op-rel E (list v u))) (??base))
-                    (op-* (op-I (op-eq? (op-rel D (list ??s ??t))
-                                        (op-+ (op-rel D (list ??s ??v)) (op-rel D (list ??v ??t)))))
-                          (op-* (op-* (op-rel sigma (list ??s ??v))
-                                      (op-rel sigma (list ??v ??t)))
-                                (op-inv (op-rel sigma (list ??s ??t))))))))))
+;; (define (??base) (choose* (op-I (op-rel E (list (??var) (??var))))
+;;                           (op-rel sigma (list (??var) (??var)))
+;;                           (op delta (list (??var) (??var) (??var)))))
+;; (define ??term-1 (op-* (??base) (??base)))
 
-(define g-f-r (exp->struct (normalize ((g (f sig)) 's 'v)) symbol->var symbol->rel symbol->fun))
+;; (define p
+;;   (op-+ (op-sum t (op-* (op-I (op-eq? (op-rel D (list s t)) (op-+ (op-rel D (list s v)) (op-rel D (list v t)))))
+;;                         (op-* (op-inv (op-rel sigma (list s t))) (op-* (op-rel sigma (list s v)) (op-I (op-rel E (list v t)))))))
+;;         (op-sum
+;;          t (op-sum
+;;             u (op-* (op-* (op-I (op-rel E (list v u))) (??base))
+;;                     (op-* (op-I (op-eq? (op-rel D (list ??s ??t))
+;;                                         (op-+ (op-rel D (list ??s ??v)) (op-rel D (list ??v ??t)))))
+;;                           (op-* (op-* (op-rel sigma (list ??s ??v))
+;;                                       (op-rel sigma (list ??v ??t)))
+;;                                 (op-inv (op-rel sigma (list ??s ??t))))))))))
 
-(define M
-  (synthesize
-   #:forall (append (hash-values symbol->rel)
-                    (hash-values symbol->var)
-                    #;(hash-values symbol->fun)
-                    (list sum inv))
-   #:guarantee (assert (eq? (interpret p) (interpret g-f-r)))))
+;; (define g-f-r (exp->struct (normalize ((g (f sig)) 's 'v)) symbol->var symbol->rel symbol->fun))
 
-(evaluate p M)
+;; (define M
+;;   (synthesize
+;;    #:forall (append (hash-values symbol->rel)
+;;                     (hash-values symbol->var)
+;;                     #;(hash-values symbol->fun)
+;;                     (list sum inv))
+;;    #:guarantee (assert (eq? (interpret p) (interpret g-f-r)))))
+
+;; (evaluate p M)

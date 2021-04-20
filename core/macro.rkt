@@ -92,15 +92,14 @@
           [lhs (make-pattern g-r)])
       (~a lhs `(S ,@(map make-pattern xs)) #:separator "=>")))
 
-  (define (r xs)
-    (e->s (apply (hash-ref meta 'r) xs)))
+  (define r (compose1 e->s (hash-ref meta 'r)))
 
   (define h-g-r
       (gen-grammar type->var type->rel fun->type
                  #;(list op-+ op-*)
                  (list op-+ op-* op--)
                  #;(list op-+ op-* op-/)
-                 r g-f-r (e->s g-r)))
+                 r (procedure-arity (hash-ref meta 'r)) g-f-r (e->s g-r)))
 
   (define M
     (synthesize

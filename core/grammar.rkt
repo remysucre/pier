@@ -4,14 +4,17 @@
 (require rosette/lib/angelic) ; provides `choose*`
 
 (require "ops.rkt")
+(require "util.rkt")
 
 (provide (all-defined-out))
 
-(define (gen-grammar type->var type->rel fun->type ops r p g)
+(define (gen-grammar type->var type->rel fun->type ops r r-a p g)
 
   (define (rec? p)
     (match p
-      [(op-rel _ xs) (or (eq? (r xs) p) (eq? (r xs) (op-I p)))]
+      [(op-rel _ xs)
+       (with-handlers ([exn:fail:contract:arity? (lambda (exn) #f)])
+         (or (eq? (apply r xs) p) (eq? (apply r xs) (op-I p))))]
       [(op _ xs) (or (map rec? xs))]
       [(op-I x) (rec? x)]
       [(op-&& x y) (or (rec? x) (rec? y))]

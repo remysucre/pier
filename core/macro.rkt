@@ -95,11 +95,9 @@
   (define r (compose1 e->s (hash-ref meta 'r)))
 
   (define h-g-r
-      (gen-grammar var->type type->var type->rel fun->type
-                 #;(list op-+ op-*)
+    (gen-grammar var->type type->var type->rel fun->type
                  (list op-+ op-* op--)
-                 #;(list op-+ op-* op-/)
-                 r (procedure-arity (hash-ref meta 'r)) g-f-r (e->s g-r)))
+                 g-f-r (e->s g-r)))
 
   (define M
     (synthesize

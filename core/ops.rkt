@@ -1,5 +1,5 @@
 #lang rosette/safe
-
+(require rosette/lib/destruct)
 (provide (all-defined-out))
 
 (struct op-rel (r xs) #:transparent)
@@ -33,3 +33,18 @@
 (define-symbolic temp integer?)
 ;; (assert (forall (list temp) (= (sum temp 0) 0)))
 (assert (forall (list temp) (= (sum 0 temp) temp)))
+
+(define (fix f g)
+  (destruct g
+    [(op-I r) (op-I (f r))]
+    [(op-inv x) (op-inv (f x))]
+    [(op-* x y) (op-* (f x) (f y))]
+    [(op-+ x y) (op-+ (f x) (f y))]
+    [(op-- x y) (op-- (f x) (f y))]
+    [(op-/ x y) (op-/ (f x) (f y))]
+    [(op-eq? x y) (op-eq? (f x) (f y))]
+    [(op-leq x y) (op-leq (f x) (f y))]
+    [(op-sum v e) (op-sum (f v) (f e))]
+    [(op-rel R xs) (op-rel (f R) (map f xs))]
+    [(op o xs) (op (f o) (map f xs))]
+    [_ g]))

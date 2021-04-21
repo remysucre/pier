@@ -48,17 +48,23 @@
       [(? constant? g) (hash-ref! env g (λ () (??v)))]
       [_ g]))
 
+  (define (appears r g) (member r (symbolics g)))
+
+  (define (rels p)
+    (match p
+      [(op-I (op-rel r _)) (if (appears r g) 1 p)]
+      [(op-* x y) (op-* (rels x) (rels y))]
+      [_ 1]))
+
   (define (sketch p g)
-    (if (rec? p)
-        (match p
-          [(op-+ x y)
-           (match g
-             [(op-+ a b) (op-+ (sketch x a) (sketch y b))]
-             [_ (op-+ (sketch x g) (sketch y g))])]
-          [(op-sum x e) (op-sum x (sketch e g))]
-          [(op-* _ _) (op-* (??factor 0) (sk g))]
-          [_ p])
-        p))
+    (match p
+      [(op-+ x y)
+       (match g
+         [(op-+ a b) (op-+ (sketch x a) (sketch y b))]
+         [_ (op-+ (sketch x g) (sketch y g))])]
+      [(op-sum x e) (op-sum x (sketch e g))]
+      [(op-* x y) (op-* (op-* (rels p) (??factor 0)) (sk g))]
+      [_ p]))
 
   (define (??var t) (apply choose* (hash-ref type->var t)))
   (define (??vars ts)
@@ -89,4 +95,4 @@
         (apply choose* (append ws (??rel) (??fun) (list 0 1)))
         ((??o) (??factor (- depth 1)) (??factor (- depth 1)))))
 
-  (sketch p g))
+  (match p [(op-+ x y) (op-+ x (sketch y g))]))

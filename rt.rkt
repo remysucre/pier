@@ -34,32 +34,6 @@
 
 (hash-update! type->var 'int? (curry cons (op-- t 1)))
 
-;; (define ??t-1 (choose* t j (op-- t 1)))
-;; (define ??j (choose* t j (op-- t 1)))
-
-;; (define sketch (op-+ (op-sum
-;;        j (op-sum
-;;           w (op-* (op-I (op-eq? j t))
-;;                   (op-* (op-I (op-leq 1 j))
-;;                         (op-* (op-I (op-leq j t))
-;;                               (op-* w (op-I (op-rel v (list j w)))))))))
-;;       (op-sum
-;;        j (op-sum
-;;           w (op-* (op-* w (op-I (op-rel R (list ??t-1 j w))))
-;;                   (op-* (op-I (op-leq 1 j))
-;;                         (op-I (op-leq j ??t-1))))))))
-
-;; (define g-f-r (exp->struct (normalize ((g (f r)) 't)) symbol->var symbol->rel symbol->fun))
-
-;; (define M
-;;   (synthesize
-;;    #:forall (append (hash-values symbol->rel)
-;;                     (hash-values symbol->var)
-;;                     #;(hash-values symbol->fun)
-;;                     (list sum inv))
-;;    #:guarantee (assert (eq? (interpret sketch) (interpret g-f-r)))))
-;; (evaluate sketch M)
-
 (optimize)
 
 ;; (+ (vec-get j w t) (S (- t 1)))

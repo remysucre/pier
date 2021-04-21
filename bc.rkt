@@ -40,37 +40,3 @@
                         (rel sigma s t))))))
 
 (optimize)
-
-;; (define ??s (choose* s t u v))
-;; (define ??v (choose* s t u v))
-;; (define ??t (choose* s t u v))
-;; (define (??var) (choose* s t u v))
-
-;; (define (??base) (choose* (op-I (op-rel E (list (??var) (??var))))
-;;                           (op-rel sigma (list (??var) (??var)))
-;;                           (op delta (list (??var) (??var) (??var)))))
-;; (define ??term-1 (op-* (??base) (??base)))
-
-;; (define p
-;;   (op-+ (op-sum t (op-* (op-I (op-eq? (op-rel D (list s t)) (op-+ (op-rel D (list s v)) (op-rel D (list v t)))))
-;;                         (op-* (op-inv (op-rel sigma (list s t))) (op-* (op-rel sigma (list s v)) (op-I (op-rel E (list v t)))))))
-;;         (op-sum
-;;          t (op-sum
-;;             u (op-* (op-* (op-I (op-rel E (list v u))) (??base))
-;;                     (op-* (op-I (op-eq? (op-rel D (list ??s ??t))
-;;                                         (op-+ (op-rel D (list ??s ??v)) (op-rel D (list ??v ??t)))))
-;;                           (op-* (op-* (op-rel sigma (list ??s ??v))
-;;                                       (op-rel sigma (list ??v ??t)))
-;;                                 (op-inv (op-rel sigma (list ??s ??t))))))))))
-
-;; (define g-f-r (exp->struct (normalize ((g (f sig)) 's 'v)) symbol->var symbol->rel symbol->fun))
-
-;; (define M
-;;   (synthesize
-;;    #:forall (append (hash-values symbol->rel)
-;;                     (hash-values symbol->var)
-;;                     #;(hash-values symbol->fun)
-;;                     (list sum inv))
-;;    #:guarantee (assert (eq? (interpret p) (interpret g-f-r)))))
-
-;; (evaluate p M)

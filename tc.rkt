@@ -6,17 +6,18 @@
 
 (idb (r x y) `(I (rel R ,x ,y)))
 
-(stratum (f r)
+#;(stratum (f r)
      (λ (x y)
        (+ (I (rel E x y))
           (sum z (* (r x z)
                     (I (rel E z y)))))))
+(stratum (f r)
+     (λ (x y)
+          (sum z (* (r x z)
+                    (I (rel E z y))))))
 
 (stratum (g r)
      (λ (y) (r 1 y)))
-
-(hash-update! type->var 'id? (curry cons 1))
-(hash-update! type->var 'id? (curry cons 0))
 
 (optimize)
 

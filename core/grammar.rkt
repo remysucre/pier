@@ -8,7 +8,7 @@
 
 (provide (all-defined-out))
 
-(define (gen-grammar type->var type->rel fun->type ops r r-a p g)
+(define (gen-grammar var->type type->var type->rel fun->type ops r r-a p g)
 
   (define (rec? p)
     (match p
@@ -45,7 +45,7 @@
       [(op-rel R xs) (op-rel R (map sk xs))]
       [(op f xs) (op f (map sk xs))]
       [(op-I r) (op-I (sk r))]
-      [(? constant? g) (hash-ref! env g (λ () (??v)))]
+      [(? constant? g) (hash-ref! env g (λ () (??var (hash-ref var->type g))))]
       [_ g]))
 
   (define (appears r g) (member r (symbolics g)))
@@ -95,4 +95,5 @@
         (apply choose* (append ws (??rel) (??fun) (list 0 1)))
         ((??o) (??factor (- depth 1)) (??factor (- depth 1)))))
 
-  (match p [(op-+ x y) (op-+ x (sketch y g))]))
+  #;(match p [(op-+ x y) (op-+ x (sketch y g))])
+  (sketch p g))

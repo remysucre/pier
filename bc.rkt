@@ -25,12 +25,18 @@
 (assert (= (* (inv (sigma s u)) (sigma s u)) 1))
 (assert (= (* (inv (sigma s t)) (sigma s t)) 1))
 
-(stratum (f sig)
+#;(stratum (f sig)
          (λ (v t) (+
             (I (rel E v t))
             (sum u
                  (* (* (sig u t) (I (rel E v u)))
                     (I (= (rel D v t) (+ 1 (rel D u t)))))))))
+
+(stratum (f sig)
+         (λ (v t)
+            (sum u
+                 (* (* (sig u t) (I (rel E v u)))
+                    (I (= (rel D v t) (+ 1 (rel D u t))))))))
 
 (stratum (g sig)
          (λ (s v)

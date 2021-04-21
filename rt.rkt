@@ -2,9 +2,10 @@
 (require "core/lib.rkt")
 (require rosette/lib/angelic) ; provides `choose*`
 
-(decl rel R (~> int? int? int? bool?))
-(decl rel v (~> int? int? bool?))
-(decl var t j w int?)
+(decl rel R (~> id? id? int? bool?))
+(decl rel v (~> id? int? bool?))
+(decl var t j id?)
+(decl var w int?)
 
 (idb (r x y w) `(I (rel R ,x ,y ,w)))
 
@@ -17,12 +18,18 @@
 
 ;; R(t,j,w):-v(j,w),t=j.
 ;; R(t,j,w):-R(t-1,j,w),1<=j<t.
-(stratum (f r)
+#;(stratum (f r)
      (λ (t j w)
        (+ (* (I (rel v j w)) (I (= t j)))
           (* (r (- t 1) j w)
              (* (I (<= 1 (- t 1)))
                 (I (<= j (- t 1))))))))
+
+(stratum (f r)
+     (λ (t j w)
+          (* (r (- t 1) j w)
+             (* (I (<= 1 (- t 1)))
+                (I (<= j (- t 1)))))))
 
 ;; P[t]=sum[j,w:R(t,j,w)*w].
 (stratum (g r)
@@ -32,7 +39,7 @@
                  (* (* (r t j w) w)
                     (* (I (<= 1 j)) (I (<= j t))))))))
 
-(hash-update! type->var 'int? (curry cons (op-- t 1)))
+(hash-update! type->var 'id? (curry cons (op-- t 1)))
 
 (optimize)
 

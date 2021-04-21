@@ -95,7 +95,7 @@
   (define r (compose1 e->s (hash-ref meta 'r)))
 
   (define h-g-r
-      (gen-grammar type->var type->rel fun->type
+      (gen-grammar var->type type->var type->rel fun->type
                  #;(list op-+ op-*)
                  (list op-+ op-* op--)
                  #;(list op-+ op-* op-/)

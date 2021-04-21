@@ -15,7 +15,7 @@
 (idb (r x y w) `(I (rel R ,x ,y ,w)))
 
 ;; recursive stratum
-(stratum (f r)
+#;(stratum (f r)
   (λ (x z w) (+
      ;; R(x,z,w) :- E(x,z,w).
      (I (rel E x z w))
@@ -24,6 +24,13 @@
        #;(* (* (r x y w1) (r y z w2)) (I (= w (* w1 w2))))
        #;(* (* (I (rel E x y w1)) (r y z w2)) (I (= w (* w1 w2))))
        (* (* (r x y w1) (I (rel E y z w2))) (I (= w (* w1 w2))))))))))
+(stratum (f r)
+  (λ (x z w)
+     ;; R(x,z,w) :- R(x,y,w1), E(y,x,w2), w=w1+w2.
+     (sum y (sum w1 (sum w2
+       #;(* (* (r x y w1) (r y z w2)) (I (= w (* w1 w2))))
+       #;(* (* (I (rel E x y w1)) (r y z w2)) (I (= w (* w1 w2))))
+       (* (* (r x y w1) (I (rel E y z w2))) (I (= w (* w1 w2)))))))))
 
 ;; "return" stratum
 (stratum (g r)

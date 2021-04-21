@@ -8,9 +8,8 @@
 
 (stratum (f r)
      (λ (x y)
-       (+ (I (rel E x y))
           (sum z (* (I (rel E x z))
-                    (r z y))))))
+                    (r z y)))))
 
 (stratum (g r)
      (λ (y) (r 1 y)))
@@ -19,9 +18,6 @@
 (assert (forall (list a b c)
                 (<=> (&& (E a b) (R b c))
                      (&& (R a b) (E b c)))))
-
-(hash-update! type->var 'id? (curry cons 0))
-(hash-update! type->var 'id? (curry cons 1))
 
 (optimize)
 

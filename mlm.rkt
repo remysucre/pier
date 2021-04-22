@@ -1,37 +1,15 @@
 #lang rosette
-(require "core/lib.rkt")
 
-(decl rel V (~> id? int?))
-(decl rel E T (~> id? id? bool?))
-(decl var x y z id?)
+(define-symbolic E (~> integer? integer? integer?))
+(define-symbolic x y z w integer?)
 
-(idb (t x y) `(I (rel T ,x ,y)))
+(define-symbolic uf (~> integer? integer?))
+(define-symbolic sum-uf (~> integer? integer? integer?))
 
-(stratum (f t)
-         (λ (x y)
-           (sum z (* (t x z)
-                     (I (rel E z y))))))
+(define (sum x f) (sum-uf x (f x)))
+(define (exist x f) (sum-uf x (* (f x) (f (uf x)))))
 
-(assert (forall (list temp) (= (sum temp 0) 0)))
+(assert (forall (list x y z w) (= (* (E x z) (E y z)) (E x z))))
 
-(stratum (g t)
-         (λ (x)
-           (sum y (* (rel V y)
-                     (t x y)))))
-
-(assert (forall (list x y z) (eq? (&& (E x z) (E y z)) (E x z))))
-
-(assert (forall (list x y z) (= (* (I (E x y)) (I (T y z)))
-                                (* (I (T x y)) (I (E y z))))))
-
-(verify (assert (= (sum z (I (E z y))) (sum z (* (I (E z y)) (I (E x y)))))))
-
-;; (optimize)
-
-;; T(M,M2):- ∃[M1.T(M,M1),E(M1,M2)].
-;; S(M,M2)=sum[M1:S(M,M1)*T(M1,M2)].
-;; Key constraint on M2.
-
-;; (sum z (* (I (rel E x z)) (S z)))
-
-;; (sum z (* (I (rel E x z)) (sum y (* (rel V y) (* (I (rel E z y))  (I (rel T z y)))))))
+(verify (assert (= (sum z (λ (z) (E z y)))
+                   (exist z (λ (z) (E z y))))))

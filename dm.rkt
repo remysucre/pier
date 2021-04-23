@@ -1,6 +1,7 @@
-#lang rosette
+#lang rosette/safe
 
 ;; (require rosette/solver/smt/cvc4)
+;; (current-solver (cvc4))
 
 ;; T(x,y,w) :- E(x,y,w).
 ;; T(x,y,w) :- E(x,z,w1), T(z,y,w2), w=w1+w2.
@@ -9,6 +10,7 @@
 ;; Prove: T . x, y -> w
 
 (define start (current-milliseconds))
+;; (output-smt "/home/remywang/projects/pier")
 
 (define-symbolic T (~> integer? integer? integer? boolean?))
 (define-symbolic E (~> integer? integer? integer? boolean?))

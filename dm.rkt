@@ -1,10 +1,14 @@
 #lang rosette
 
+(require rosette/solver/smt/cvc4)
+
 ;; T(x,y,w) :- E(x,y,w).
 ;; T(x,y,w) :- E(x,z,w1), T(z,y,w2), w=w1+w2.
 
 ;; Given: E . y -> x, w
 ;; Prove: T . x, y -> w
+
+(define start (current-milliseconds))
 
 (define-symbolic T (~> integer? integer? integer? boolean?))
 (define-symbolic E (~> integer? integer? integer? boolean?))
@@ -21,10 +25,12 @@
                 (=> (&& (T x y w1) (T x y w2))
                     (= w1 w2))))
 
-(define (ef x y w)
+(define (f x y w)
   (&& (T x z w1)
       (E z y w2)
       (= w (+ w1 w2))))
 
-(verify (assert (=> (&& (ef x y w1) (ef x y w2))
+(verify (assert (=> (&& (f x y w1) (f x y w2))
                     (= w1 w2))))
+
+(- (current-milliseconds) start)

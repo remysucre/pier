@@ -1,6 +1,6 @@
 #lang rosette
 
-(require rosette/solver/smt/cvc4)
+;; (require rosette/solver/smt/cvc4)
 
 ;; T(x,y,w) :- E(x,y,w).
 ;; T(x,y,w) :- E(x,z,w1), T(z,y,w2), w=w1+w2.

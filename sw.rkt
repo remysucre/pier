@@ -8,6 +8,8 @@
 (decl var t j id?)
 (decl var w k int?)
 
+(assert (forall (list t j w) (=> (R t j w) (&& (<= 1 j) (<= j t)))))
+
 (idb (r x y w) `(I (rel R ,x ,y ,w)))
 
 (def (vec-get j w t)
@@ -33,7 +35,7 @@
                 (I (<= j (- t 1)))))))
 
 ;; P[t]=sum[j,w:R(t,j,w)*w].
-(stratum (g r)
+#;(stratum (g r)
      (λ (t k)
        (- (sum j
             (sum w
@@ -43,6 +45,15 @@
             (sum w
                  (* (* (r (- t k) j w) w)
                     (* (I (<= 1 j)) (I (<= j (- t k))))))))))
+
+(stratum (g r)
+     (λ (t k)
+       (- (sum j
+            (sum w
+                 (* (r t j w) w)))
+          (sum j
+            (sum w
+                 (* (r (- t k) j w) w))))))
 
 (hash-update! type->var 'id? (curry cons (op-- t 1)))
 
